@@ -1,0 +1,29 @@
+{
+  "name": "listick",
+  "version": "0.1.0",
+  "description": "Laconic state container for TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/artemkasan/listick.git"
+  },
+  "keywords": [
+    "listick"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"build": "tsc"
+  },
+  "author": "Artem Labutin",
+  "license": "MIT",
+  "dependencies": {
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.5.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "typescript": "^2.5.3"
+  }
+}
