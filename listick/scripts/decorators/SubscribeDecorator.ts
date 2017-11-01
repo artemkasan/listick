@@ -10,7 +10,7 @@ export function subscribe<TEvent, TArgs>(
 	getEventCallback: GetEventCallback<TEvent, TArgs>)
 	: MethodDecorator
 {
-	return <T>(target: object, propertyKey: string, descriptor: TypedPropertyDescriptor<T>)
+	return <T>(target: object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>)
 		: TypedPropertyDescriptor<T> =>
 	{
 		if (!(Reflect || Reflect.defineMetadata ))
@@ -23,7 +23,7 @@ export function subscribe<TEvent, TArgs>(
 			Reflect.defineMetadata(MetadataKeys.eventResolver, { eventContainer, getEventCallback }, target, propertyKey);
 		}
 
-		const subscribedListeners: string[] = Reflect.getMetadata(MetadataKeys.subscribedListeners, target) || [];
+		const subscribedListeners: Array<string | symbol> = Reflect.getMetadata(MetadataKeys.subscribedListeners, target) || [];
 		subscribedListeners.push(propertyKey);
 		Reflect.defineMetadata(MetadataKeys.subscribedListeners, subscribedListeners, target);
 		return descriptor;

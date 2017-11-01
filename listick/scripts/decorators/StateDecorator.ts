@@ -6,12 +6,12 @@ import { IStateOptions } from "./StateOptions";
 
 export function state(options: IStateOptions): PropertyDecorator
 {
-	return <TObject extends FunctionConstructor, TProperty extends keyof TObject>(
-		target: TObject,
-		propertyKey: TProperty) =>
+	return (
+		target: Object,
+		 propertyKey: string | symbol): void =>
 	{
 		Reflect.defineMetadata(MetadataKeys.stateStateModifier, options.stateModifier, target, propertyKey);
-		const states: string[] = Reflect.getMetadata(MetadataKeys.storeOwnStates, target) || [];
+		const states: Array<string | symbol> = Reflect.getMetadata(MetadataKeys.storeOwnStates, target) || [];
 
 		states.push(propertyKey);
 		Reflect.defineMetadata(MetadataKeys.storeOwnStates, states, target);

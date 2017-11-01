@@ -9,12 +9,6 @@ interface ICounterProps
 	text: string;
 }
 
-class CounterStateProps
-{
-	state: ICounterState;
-	counterService: CounterService
-}
-
 @connect<ICounterProps, ICounterState>((store: AppStore) => store.counterState)
 export default class Counter extends React.Component<ICounterProps, ICounterState>
 {

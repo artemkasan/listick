@@ -18,7 +18,6 @@ module.exports = (env) =>
 		},
 		entry: {
 			vendor: [
-				'jquery',
 				'react',
 				'react-dom',
 				'history',

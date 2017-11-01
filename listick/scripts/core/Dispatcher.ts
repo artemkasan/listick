@@ -1,16 +1,13 @@
-﻿import { Subject as RxSubject } from "rxjs";
-
+﻿
 type DispatcherAction = () => void;
 
 export default class Dispatcher
 {
-	private invokeSubject: RxSubject<DispatcherAction>;
+	private invokeSubject: DispatcherAction[] = [];
 	private static _currentDispatcher: Dispatcher = new Dispatcher();
 
 	private constructor()
 	{
-		this.invokeSubject = new RxSubject<DispatcherAction>();
-		this.invokeSubject.subscribe(this.processAction);
 	}
 
 	public static get currentDispatcher(): Dispatcher
@@ -20,22 +17,47 @@ export default class Dispatcher
 
 	public invoke<TArgs, TResult>(callback: () => void): Promise<void>
 	{
-		return new Promise<void>((resolve) =>
+		return new Promise<void>((resolve, reject) =>
 		{
-			this.invokeSubject.next(callback);
-			resolve(undefined);
+			this.invokeSubject.push(() =>
+			{
+				try
+				{
+					callback();
+					resolve();
+				}
+				catch
+				{
+					reject();
+				}
+			});
+		
+			this.startProcessingActions();
 		});
 	}
 
-	private processAction(value: DispatcherAction)
+	private startProcessingActions()
+	{
+		setTimeout(() => this.processAction(), 1);
+	}
+
+	private processAction()
 	{
 		try
 		{
-			value();
+			const value = this.invokeSubject.splice(0, 1);
+			if(value.length > 0)
+			{
+				value[0]();
+			}
 		}
 		catch (e)
 		{
 			console.dir(e);
+		}
+		if(this.invokeSubject.length > 0)
+		{
+			this.startProcessingActions();
 		}
 	}
 }
