@@ -1,4 +1,6 @@
 scripts/
+tests/
+coverage/
 node_modules/
 tsconfig.json
 *.tgz

@@ -270,3 +270,4 @@ yarn.lock
 /listick-example/dist
 /listick-example/app.js
 /listick-example/app.js.map
+/listick/coverage
