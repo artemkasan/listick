@@ -4,6 +4,14 @@ Listick allows to do predictable state modifcation using TypeScript
 ### Influences
 When I've started to use [Redux]('http://redux.js.org'>) in Typescript, in general Redux idea is great, but later I've find out that I have to do a lot of redundant work: declaration of actions with discriminated union, declaration of states and then join them together in one state and etc. Also Redux has remind me beginning of 2000 years. That old days all C++ developer used WinProc for processing messages. And later C# introduced events as replacement of message processing mechanism. Another idea is taken from [Angular](https://angular.io/) which uses great feature - decorators. Taken all these ideas into account I've started to create a Listick.
 
+### How to run example
+All you need is to execute two commands:
+```sh
+build.yarn.sh
+node ./listick-example/app.js
+```
+Then you can open browser and enter url: http://localhost:3000
+
 ### How it works
 Look at listick-example. This shows how to simply implement predicatable state using react.
 
