@@ -2,15 +2,14 @@
 
 import * as MetadataKeys from "../core/MetadataKeys";
 import { Type } from "../core/Type";
-import { IStateOptions } from "./StateOptions";
 
-export function state(options: IStateOptions): PropertyDecorator
+export function state(stateModifier: Type<any>): PropertyDecorator
 {
 	return (
 		target: Object,
 		 propertyKey: string | symbol): void =>
 	{
-		Reflect.defineMetadata(MetadataKeys.stateStateModifier, options.stateModifier, target, propertyKey);
+		Reflect.defineMetadata(MetadataKeys.stateStateModifier, stateModifier, target, propertyKey);
 		const states: Array<string | symbol> = Reflect.getMetadata(MetadataKeys.storeOwnStates, target) || [];
 
 		states.push(propertyKey);

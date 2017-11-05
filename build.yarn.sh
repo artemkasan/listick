@@ -1,9 +1,11 @@
 cd ./listick
 yarn
+yarn run build
 yarn pack
 
 cd ../listick-react
 yarn
+yarn run build
 yarn pack
 
 cd ../listick-example

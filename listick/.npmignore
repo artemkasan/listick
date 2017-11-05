@@ -3,4 +3,5 @@ tests/
 coverage/
 node_modules/
 tsconfig.json
+karma.conf.js
 *.tgz

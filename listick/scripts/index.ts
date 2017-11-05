@@ -1,6 +1,5 @@
 export { SimpleEvent } from "./events/SimpleEvent";
 export { inject } from "./decorators/inject";
-export { IStateOptions } from "./decorators/StateOptions";
 export { state } from "./decorators/StateDecorator";
 export { IStateModifierOptions } from "./decorators/StateModifierOptions";
 export { stateModifier} from "./decorators/StateModifierDecorator";

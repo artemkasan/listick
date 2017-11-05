@@ -10,6 +10,6 @@ import { CounterStateModifier, ICounterState } from "./stateModifiers/counterSta
 })
 export class AppStore
 {
-	@state({ stateModifier: CounterStateModifier })
+	@state(CounterStateModifier)
 	public counterState: ICounterState;
 }

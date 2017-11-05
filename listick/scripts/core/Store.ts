@@ -55,7 +55,7 @@ export class Store<T>
 		return service;
 	}
 
-	private initializeStateModifier(storeInstance: T, storeType: Type<T>, storeProperty: keyof T): void
+	private initializeStateModifier<K extends keyof T>(storeInstance: T, storeType: Type<T>, storeProperty: K): void
 	{
 		const stateModifierType: Type<any> = Reflect.getMetadata(
 			MetadataKeys.stateStateModifier,
@@ -75,21 +75,28 @@ export class Store<T>
 			MetadataKeys.subscribedListeners,
 			stateModifierType.prototype) as string[];
 
-		for (const stateModifierPropertyName of subscribedListeners)
+		if(subscribedListeners === undefined)
 		{
-			const eventResolver = Reflect.getMetadata(
-					MetadataKeys.eventResolver,
-					stateModifierType.prototype,
-					stateModifierPropertyName) as IGetEventCallbackInfo<any, any>;
-
-			const eventContainerInstance = this.getEventContainerInstance(eventResolver.eventContainer);
-			const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
-			const stateModifierItem = stateModifier[stateModifierPropertyName] as (prevState: any, args: any) => any;
-			eventHandler.add((sender, args) =>
+			console.warn(`No subscriptions are defined for ${stateModifierType.name}`)
+		}
+		else
+		{
+			for (const stateModifierPropertyName of subscribedListeners)
 			{
-				storeInstance[storeProperty] = stateModifierItem(storeInstance[storeProperty], args);
-				this.onStateChanged();
-			});
+				const eventResolver = Reflect.getMetadata(
+						MetadataKeys.eventResolver,
+						stateModifierType.prototype,
+						stateModifierPropertyName) as IGetEventCallbackInfo<any, any>;
+
+				const eventContainerInstance = this.getEventContainerInstance(eventResolver.eventContainer);
+				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
+				const stateModifierItem = stateModifier[stateModifierPropertyName] as (prevState: any, args: any) => any;
+				eventHandler.add((sender, args) =>
+				{
+					storeInstance[storeProperty] = stateModifierItem(storeInstance[storeProperty], args);
+					this.onStateChanged();
+				});
+			}
 		}
 	}
 

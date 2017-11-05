@@ -1,4 +1,4 @@
-﻿import Dispatcher from "../core/dispatcher";
+﻿import Dispatcher from "../core/Dispatcher";
 
 export type EventCallback<TArgs> = (sender: any, args: TArgs) => void;
 

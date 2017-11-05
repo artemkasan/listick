@@ -95,7 +95,7 @@ Store combines all these modules together.
 })
 export class AppStore
 {
-	@state({ stateModifier: CounterStateModifier })
+	@state(stateModifier: CounterStateModifier)
 	public counterState: ICounterState;
 }
 ```

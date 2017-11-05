@@ -1,10 +1,11 @@
 import "mocha";
 
-import { inject, state, store, stateModifier, buildStore, SimpleEvent } from '../../scripts';
+import { inject, state, store, stateModifier, subscribe, buildStore, SimpleEvent } from '../../scripts';
+import { assert } from "chai";
 
 describe("Instantiating store", () =>
 {
-	class CounterEventContainer
+	class CounterEvents
 	{
 		public increment: SimpleEvent<number> = new SimpleEvent<number>();
 		public decrement: SimpleEvent<number> = new SimpleEvent<number>();
@@ -13,42 +14,60 @@ describe("Instantiating store", () =>
 	@inject class CounterService
 	{
 		constructor(
-			private counterEvents: CounterEventContainer) {}
+			private counterEvents: CounterEvents) {}
 
-		public increment()
+		public increment() : Promise<void>
 		{
-			this.counterEvents.increment.fire(this, 1);
-		}
-
-		public decrement()
-		{
-			this.counterEvents.decrement.fire(this, 1);
+			return this.counterEvents.increment.fire(this, 1);
 		}
 	}
 
-	@stateModifier<{ count: number}>({
-		 eventContainers: [CounterEventContainer],
-		 initialState: { count: 0 }
+	interface ICounterState
+	{
+		count: number;
+	}
+
+	@stateModifier<ICounterState>({
+		 eventContainers: [CounterEvents],
+		 initialState: { count: 2 }
 		 })
 	class CounterStateModifier
 	{
-
+		@subscribe(CounterEvents, (eventsContainer) => eventsContainer.increment)
+		public onIncrement(prevState:ICounterState, args: number): ICounterState
+		{
+			return {
+				...prevState,
+				count: prevState.count + args
+			};
+		}
 	}
 
 	@store({
-		eventContainers: [CounterEventContainer],
+		eventContainers: [CounterEvents],
 		services: [CounterService]
 	})
 	class MyStore
 	{
-		@state({ stateModifier: CounterStateModifier})
-		public counter: { 
-			count: number
-		}
+		@state(CounterStateModifier)
+		public counter: ICounterState;
 	};
 
-	it("test1", () =>
+	it("simple initialization", () =>
 	{
 		const store = buildStore(MyStore);
+	});
+
+	it("store modification", (done) =>
+	{
+		const store = buildStore(MyStore);
+		store.stateChanged.add(() =>
+		{
+			assert.equal(3, store.getStore().counter.count, "store state was not updated");
+			done();
+		});
+		assert.equal(2, store.getStore().counter.count, "initial value for store was not applied");
+		const counterService = store.getService(CounterService);
+		counterService.increment();
 	});
 });

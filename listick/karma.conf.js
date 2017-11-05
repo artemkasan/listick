@@ -1,5 +1,6 @@
 // Karma configuration
 // Generated on Wed Nov 01 2017 22:32:53 GMT+0100 (Западная Европа (зима))
+tsConfig = require('./tests/tsconfig.json');
 
 module.exports = function(config) {
   config.set({
@@ -10,8 +11,14 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha','chai', "karma-typescript"],
-
+	frameworks: ['mocha','chai', "karma-typescript"],
+	
+	plugins : [
+		require('karma-mocha'),
+		require('karma-typescript'),
+		require('karma-chai'),
+		require('karma-chrome-launcher')
+	],
 
     // list of files / patterns to load in the browser
     files: [
@@ -37,20 +44,10 @@ module.exports = function(config) {
     reporters: ['progress', "karma-typescript"],
 
 	karmaTypescriptConfig:{
-		compilerOptions: {
-			"module": "commonjs",
-			"moduleResolution": "node",
-			"target": "es5",
-			"experimentalDecorators": true,
-			"emitDecoratorMetadata": true,
-			"sourceMap": true,
-			"skipDefaultLibCheck": true,
-			"strict": true,
-			"lib": ["es6", "dom"],
-			"declaration": true,
-		},
+		compilerOptions: tsConfig.compilerOptions,
 		bundlerOptions: {
-			transforms: [require("karma-typescript-es6-transform")()]
+			transforms: [require("karma-typescript-es6-transform")()],
+			sourceMap : true
 		}
 	},
 
@@ -68,17 +65,23 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
-
+	autoWatch: true,
+	
+	customLaunchers: {
+		ChromeDebugging: {
+		  base: 'Chrome',
+		  flags: [ '--remote-debugging-port=9333' ]
+		}
+	  },
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['ChromeDebugging'],
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: true,
 
     // Concurrency level
     // how many browser should be started simultaneous
