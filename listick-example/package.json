@@ -4,10 +4,10 @@
   "description": "Example for Listick based on react",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:vendors": "webpack --config webpack.config.vendor.js",
-    "build:client": "webpack",
+    "build:vendors": "node_modules/.bin/webpack --config webpack.config.vendor.js",
+    "build:client": "node_modules/.bin/webpack",
     "build:server": "tsc app.ts",
-    "build": "npm run build:vendors && npm run build:client && npm run build:server"
+    "build": "yarn build:vendors && yarn build:client && yarn build:server"
   },
   "repository": {
     "type": "git",
