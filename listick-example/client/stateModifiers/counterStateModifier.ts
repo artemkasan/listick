@@ -6,13 +6,10 @@ export interface ICounterState
 	counter: number;
 }
 
-@stateModifier<ICounterState>({
-	eventContainers: [CounterEvents],
-	initialState: { counter: 2 },
-})
+@stateModifier<ICounterState>({ counter: 2 })
 export class CounterStateModifier
 {
-	@subscribe(CounterEvents, (counterEvents:CounterEvents) => counterEvents.increment)
+	@subscribe(CounterEvents, es => es.increment)
 	public onIncrement(prevState: ICounterState, args: number): ICounterState
 	{
 		return {
@@ -21,7 +18,7 @@ export class CounterStateModifier
 		};
 	}
 
-	@subscribe(CounterEvents, (counterEvents: CounterEvents) => counterEvents.decrement)
+	@subscribe(CounterEvents, es => es.decrement)
 	public onDecrement(prevState: ICounterState, args: number): ICounterState
 	{
 		return {

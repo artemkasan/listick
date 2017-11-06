@@ -27,10 +27,7 @@ describe("Instantiating store", () =>
 		count: number;
 	}
 
-	@stateModifier<ICounterState>({
-		 eventContainers: [CounterEvents],
-		 initialState: { count: 2 }
-		 })
+	@stateModifier<ICounterState>({ count: 2 })
 	class CounterStateModifier
 	{
 		@subscribe(CounterEvents, (eventsContainer) => eventsContainer.increment)

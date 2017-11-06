@@ -3,5 +3,5 @@ export const storeOwnStates = "smStoreOwnStates";
 export const eventResolver = "smEventResolver";
 export const subscribedListeners = "smSubscribedListeners";
 export const stateStateModifier = "smStateStateModifier";
-export const stateModifierOptions = "smStateModifierOptions";
+export const initialState = "smInitialState";
 export const inject = "smInject";

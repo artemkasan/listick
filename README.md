@@ -58,10 +58,7 @@ export interface ICounterState
 	counter: number;
 }
 
-@stateModifier<ICounterState>({
-	eventContainers: [CounterEvents],
-	initialState: { counter: 2 },
-})
+@stateModifier<ICounterState>({ counter: 2 })
 export class CounterStateModifier
 {
 	@subscribe(CounterEvents, (counterEvents:CounterEvents) => counterEvents.increment)
@@ -83,7 +80,7 @@ export class CounterStateModifier
 	}
 }
 ```
-Each state modifier must be marked by <b>@stateModifier</b> decorator. And inside this decorator we have to define which events it is going to listen and initial state of state modifier.
+Each state modifier must be marked by <b>@stateModifier</b> decorator. And inside this decorator we have to define initial state of state modifier.
 Each method of state modifier that must listen to events and mutate state must be marked by <b>@subscribe</b> decorator. It defines which event must be listened. Method itself do simple mutation of state.
 
 ### Store

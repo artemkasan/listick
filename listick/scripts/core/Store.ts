@@ -1,5 +1,4 @@
-﻿import { IStateModifierOptions } from "../decorators/StateModifierOptions";
-import { EventContainerType, IStoreOptions } from "../decorators/StoreOptions";
+﻿import { EventContainerType, IStoreOptions } from "../decorators/StoreOptions";
 import { SimpleEvent } from "../events/SimpleEvent";
 import { IGetEventCallbackInfo } from "./GetEventCallbackInfo";
 import * as MetadataKeys from "./MetadataKeys";
@@ -61,13 +60,13 @@ export class Store<T>
 			MetadataKeys.stateStateModifier,
 			storeType.prototype,
 			storeProperty);
-		const stateModifierOptions: IStateModifierOptions<T[keyof T]> = Reflect.getMetadata(
-			MetadataKeys.stateModifierOptions,
+		const initialState: T[keyof T] = Reflect.getMetadata(
+			MetadataKeys.initialState,
 			stateModifierType);
 
-		if (stateModifierOptions.initialState !== undefined)
+		if (initialState !== undefined && storeInstance[storeProperty] === undefined)
 		{
-			storeInstance[storeProperty] = stateModifierOptions.initialState;
+			storeInstance[storeProperty] = initialState;
 		}
 
 		const stateModifier = new stateModifierType();
