@@ -3,15 +3,23 @@
 import { GetEventCallback } from "../core/GetEventCallbackInfo";
 import * as MetadataKeys from "../core/MetadataKeys";
 import { Type } from "../core/Type";
+import { IStateModifier } from "../core/IStateModifier";
 import { SimpleEvent } from "../events/SimpleEvent";
+
+export type StateModifierItem<TState, TArgs> = (prevState: TState, args: TArgs) => Partial<TState> | TState;
+export type SubscribeDecorator<TArgs> = <TState>(
+	target: IStateModifier<TState>,
+	propertyKey: string | symbol,
+	descriptor: TypedPropertyDescriptor<StateModifierItem<TState, TArgs>>) 
+		=> TypedPropertyDescriptor<StateModifierItem<TState, TArgs>> | void;
 
 export function subscribe<TEvent, TArgs>(
 	eventContainer: Type<TEvent>,
 	getEventCallback: GetEventCallback<TEvent, TArgs>)
-	: MethodDecorator
+	: SubscribeDecorator<TArgs>
 {
-	return <T>(target: object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>)
-		: TypedPropertyDescriptor<T> =>
+	return <TState>(target: IStateModifier<TState>, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<StateModifierItem<TState, TArgs>>)
+		: TypedPropertyDescriptor<StateModifierItem<TState, TArgs>> =>
 	{
 		if (!(Reflect || Reflect.defineMetadata ))
 		{

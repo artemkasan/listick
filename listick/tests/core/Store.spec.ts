@@ -1,6 +1,6 @@
 import "mocha";
 
-import { inject, state, store, stateModifier, subscribe, buildStore, SimpleEvent } from '../../scripts';
+import { inject, state, store, subscribe, buildStore, SimpleEvent } from '../../scripts';
 import { assert } from "chai";
 
 describe("Instantiating store", () =>
@@ -27,14 +27,14 @@ describe("Instantiating store", () =>
 		count: number;
 	}
 
-	@stateModifier<ICounterState>({ count: 2 })
 	class CounterStateModifier
 	{
-		@subscribe(CounterEvents, (eventsContainer) => eventsContainer.increment)
-		public onIncrement(prevState:ICounterState, args: number): ICounterState
+		initialState: ICounterState = {count: 2 };
+
+		@subscribe(CounterEvents,ec => ec.increment)
+		public onIncrement(prevState:ICounterState, args: number): Partial<ICounterState>
 		{
 			return {
-				...prevState,
 				count: prevState.count + args
 			};
 		}
@@ -65,6 +65,81 @@ describe("Instantiating store", () =>
 		});
 		assert.equal(2, store.getStore().counter.count, "initial value for store was not applied");
 		const counterService = store.getService(CounterService);
+		counterService.increment();
+	});
+
+	it("state as simple type", (done) =>
+	{
+		class SimpleStateModifier
+		{
+			initialState: number = 0;
+
+			@subscribe(CounterEvents, se => se.increment)
+			onIncrement(prevState: number, args: number): number
+			{
+				return prevState + args;
+			}
+		}
+	
+		@store({
+			eventContainers: [CounterEvents],
+			services: [CounterService]
+		})
+		class SimpleStore {
+			@state(SimpleStateModifier)
+			public count: number;
+		}
+
+		const simpleStore = buildStore(SimpleStore);
+		simpleStore.stateChanged.add(() =>
+		{
+			assert.equal(1, simpleStore.getStore().count, "store state was not updated");
+			done();
+		});
+		assert.equal(0, simpleStore.getStore().count, "initial value for store was not applied");
+		const counterService = simpleStore.getService(CounterService);
+		counterService.increment();
+	});
+
+	it("one of state items changed", (done) =>
+	{
+		interface IComplexState
+		{
+			count: number;
+			name: string;
+		}
+	
+		class SimpleStateModifier
+		{
+			initialState:IComplexState = { count: 0, name: "John" }
+
+			@subscribe(CounterEvents, se => se.increment)
+			onIncrement(prevState: IComplexState, args: number): Partial<IComplexState>
+			{
+				return {
+					count: prevState.count + args
+				};
+			}
+		}
+	
+		@store({
+			eventContainers: [CounterEvents],
+			services: [CounterService]
+		})
+		class SimpleStore {
+			@state(SimpleStateModifier)
+			public simple: IComplexState;
+		}
+
+		const simpleStore = buildStore(SimpleStore);
+		simpleStore.stateChanged.add(() =>
+		{
+			assert.equal(1, simpleStore.getStore().simple.count, "store state was not updated");
+			assert.equal("John", simpleStore.getStore().simple.name, "parameter name has changed, but must be old");
+			done();
+		});
+		assert.equal(0, simpleStore.getStore().simple.count, "initial value for store was not applied");
+		const counterService = simpleStore.getService(CounterService);
 		counterService.increment();
 	});
 });

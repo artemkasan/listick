@@ -1,4 +1,4 @@
-import { subscribe, stateModifier, SimpleEvent } from "listick";
+import { subscribe, SimpleEvent } from "listick";
 import { CounterEvents } from "../events/counterEvents";
 
 export interface ICounterState
@@ -6,11 +6,12 @@ export interface ICounterState
 	counter: number;
 }
 
-@stateModifier<ICounterState>({ counter: 2 })
 export class CounterStateModifier
 {
+	initialState: ICounterState = { counter: 2 };
+
 	@subscribe(CounterEvents, es => es.increment)
-	public onIncrement(prevState: ICounterState, args: number): ICounterState
+	public onIncrement(prevState: ICounterState, args: number): Partial<ICounterState>
 	{
 		return {
 			...prevState,
@@ -19,7 +20,7 @@ export class CounterStateModifier
 	}
 
 	@subscribe(CounterEvents, es => es.decrement)
-	public onDecrement(prevState: ICounterState, args: number): ICounterState
+	public onDecrement(prevState: ICounterState, args: number): Partial<ICounterState>
 	{
 		return {
 			...prevState,

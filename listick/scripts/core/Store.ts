@@ -4,6 +4,7 @@ import { IGetEventCallbackInfo } from "./GetEventCallbackInfo";
 import * as MetadataKeys from "./MetadataKeys";
 import { ServiceProvider } from "./ServiceProvider";
 import { Type } from "./Type";
+import { IStateModifier } from "./IStateModifier";
 
 type StoreState<T> = keyof T;
 
@@ -56,20 +57,16 @@ export class Store<T>
 
 	private initializeStateModifier<K extends keyof T>(storeInstance: T, storeType: Type<T>, storeProperty: K): void
 	{
-		const stateModifierType: Type<any> = Reflect.getMetadata(
+		const stateModifierType: Type<IStateModifier<T[K]>> = Reflect.getMetadata(
 			MetadataKeys.stateStateModifier,
 			storeType.prototype,
 			storeProperty);
-		const initialState: T[keyof T] = Reflect.getMetadata(
-			MetadataKeys.initialState,
-			stateModifierType);
-
-		if (initialState !== undefined && storeInstance[storeProperty] === undefined)
+		const stateModifier = new stateModifierType();
+		if (storeInstance[storeProperty] === undefined)
 		{
-			storeInstance[storeProperty] = initialState;
+			storeInstance[storeProperty] = stateModifier.initialState;
 		}
 
-		const stateModifier = new stateModifierType();
 		const subscribedListeners: string[] = Reflect.getMetadata(
 			MetadataKeys.subscribedListeners,
 			stateModifierType.prototype) as string[];
@@ -89,14 +86,33 @@ export class Store<T>
 
 				const eventContainerInstance = this.getEventContainerInstance(eventResolver.eventContainer);
 				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
-				const stateModifierItem = stateModifier[stateModifierPropertyName] as (prevState: any, args: any) => any;
+				const stateModifierProperty = (stateModifier as any)[stateModifierPropertyName];
+				const stateModifierItem = (stateModifier as any)[stateModifierPropertyName] as (prevState: any, args: any) => any;
 				eventHandler.add((sender, args) =>
 				{
-					storeInstance[storeProperty] = stateModifierItem(storeInstance[storeProperty], args);
+					const prevState = storeInstance[storeProperty] as any;
+					const newState = stateModifierItem(prevState, args)
+					if(this.isObject(prevState))
+					{
+						storeInstance[storeProperty] = 
+						{
+							...prevState,
+							...newState
+						};
+					}
+					else
+					{
+						storeInstance[storeProperty] = newState;
+					}
 					this.onStateChanged();
 				});
 			}
 		}
+	}
+
+	private isObject(value: any): value is {}
+	{
+		return typeof value === "object";
 	}
 
 	private onStateChanged(): void
