@@ -1,9 +1,10 @@
 ﻿import "reflect-metadata";
 
 import * as MetadataKeys from "../core/MetadataKeys";
-import { Type } from "../core/Type";
+import {IStateModifier} from '../core/IStateModifier';
+import {Type} from "../core/Type";
 
-export function state(stateModifier: Type<any>): PropertyDecorator
+export function state<T extends IStateModifier<any>>(stateModifier: Type<T>): PropertyDecorator
 {
 	return (
 		target: Object,
