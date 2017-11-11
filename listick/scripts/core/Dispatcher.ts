@@ -1,7 +1,7 @@
 ﻿
 type DispatcherAction = () => void;
 
-export default class Dispatcher
+export class Dispatcher
 {
 	private invokeSubject: DispatcherAction[] = [];
 	private static _currentDispatcher: Dispatcher = new Dispatcher();
