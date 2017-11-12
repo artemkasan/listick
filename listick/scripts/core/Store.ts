@@ -46,9 +46,7 @@ export class Store<T>
 
 	public getStore(): T
 	{
-		return {
-			...this.storeInstance;
-		}
+		return this.storeInstance;
 	}
 
 	public setStore(value: T)
@@ -95,7 +93,7 @@ export class Store<T>
 				throw new Error(`function ${stateModifierPropertyName} returns undefined state which is not acceptable`);
 			}
 
-			const newStorePropertyValue;
+			let newStorePropertyValue: any;
 			if(this.isObject(prevState))
 			{
 				newStorePropertyValue = 
