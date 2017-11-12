@@ -18,45 +18,59 @@ export interface ConnectClassDecorator<TProps>
 
 export function connect<TProps, TState>(stateGet: (store: any) => TState): ConnectClassDecorator<TProps>
 {
+
+	let subscribedFunction: (sender: any, args: any)=> void;
+
 	return <T extends ConnectComponentClass<TProps>>(target: T): T =>
 	{
+		let store: Store<any>;
 		const inputArgs: any[] = Reflect.getMetadata("design:paramtypes", target);
-		const f = class
+		function constructorOverride(props: TProps, context: any, pThis: any)
 		{
-			constructor(props: TProps, context: any, ...args: any[])
+			const requestedServices: any[] = [];
+			store = context.store as Store<any>;
+			for (let i = 2; i < inputArgs.length; i++)
 			{
-				const requestedServices: any[] = [];
-				const store = context.store as Store<any>;
-				for (let i = 2; i < inputArgs.length; i++)
+				const service = store.getService(inputArgs[i]);
+				if (service === undefined)
 				{
-					const service = store.getService(inputArgs[i]);
-					if (service === undefined)
-					{
-						console.error(`Service ${inputArgs[i]} is not registered in store`);
-					}
-					requestedServices.push(service);
+					console.error(`Service ${inputArgs[i]} is not registered in store`);
 				}
-				const targetArgs: any[] = [
-					props,
-					context,
-					...requestedServices
-				];
-				const obj = target.apply(this, targetArgs);
-				obj.state = stateGet(store.getStore());
-				store.stateChanged.add((sender, args) =>
-				{
-					obj.setState(stateGet(store.getStore()));
-				})
-				return obj;
-			}
 
-			static contextTypes = {
-				store: PropTypes.object.isRequired
-			};
+				requestedServices.push(service);
+			}
+			const targetArgs: any[] = [
+				props,
+				context,
+				...requestedServices
+			];
+			target.apply(pThis, targetArgs);
+			pThis.state = stateGet(store.getStore());
 		}
 
-		f.prototype = target.prototype;
+		const connector = new Function(
+			"constructorOverride",
+			`return function ${target.name} (props, context) \
+				{ \
+					return constructorOverride(props, context, this); \
+				}`)(constructorOverride);
+		connector.prototype = Object.create(target.prototype);
+		connector.prototype.componentDidMount = function()
+		{
+			subscribedFunction = (sender: any, args: any) =>
+			{
+				this.setState(stateGet(store.getStore()));
+			};
+			store.stateChanged.add(subscribedFunction)
+		};
+		connector.prototype.componentWillUnmount = function()
+		{
+			store.stateChanged.remove(subscribedFunction);
+		};
+		connector.contextTypes = {
+			store: PropTypes.object.isRequired
+		}
 
-		return (f as any) as T;
+		return connector as T;
 	}
 }

@@ -18,10 +18,13 @@ module.exports = (env) =>
 		},
 		entry: {
 			vendor: [
+				'babel-polyfill',
+				'isomorphic-fetch',
 				'react',
 				'react-dom',
 				'history',
 				'react-router-dom',
+				'semantic-ui-react',
 				'reflect-metadata',
 				'listick',
 				'listick-react'

@@ -1,3 +1,5 @@
+import "babel-polyfill";
+import "isomorphic-fetch";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Router } from "react-router-dom";
@@ -7,6 +9,7 @@ import * as RoutesModule from "./routes";
 import { buildStore } from "listick";
 import { StoreContainer } from "listick-react";
 import { AppStore } from "./AppStore";
+import { Container } from "semantic-ui-react";
 
 let routes = RoutesModule.routes;
 const appStore = buildStore(AppStore);
