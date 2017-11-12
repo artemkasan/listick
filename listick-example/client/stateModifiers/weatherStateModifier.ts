@@ -9,9 +9,9 @@ export enum WeatherGridState
 }
 export interface IWeatherState
 {
-    gridState: WeatherGridState;
-    error: string | null;
-    content: Array<{ id: number, name: string, degree: number }>;
+	gridState: WeatherGridState;
+	error: string | null;
+	content: Array<{ id: number, name: string, degree: number }>;
 }
 
 export class WeatherStateModifier
@@ -22,9 +22,9 @@ export class WeatherStateModifier
 	public onStartLoading(prevState: IWeatherState, args: boolean): Partial<IWeatherState>
 	{
 		return {
-            gridState: WeatherGridState.loading,
-            error: null,
-            content: []
+			gridState: WeatherGridState.loading,
+			error: null,
+			content: []
 		};
 	}
 
@@ -32,18 +32,18 @@ export class WeatherStateModifier
 	public onLoadingFailed(prevState: IWeatherState, args: string): Partial<IWeatherState>
 	{
 		return {
-            gridState: WeatherGridState.loaded,
-            error: args
+			gridState: WeatherGridState.loaded,
+			error: args
 		};
 	}
 
-    @subscribe(WeatherEvents, es => es.updateWeather)
+	@subscribe(WeatherEvents, es => es.updateWeather)
 	public onWeatherUpdated(prevState: IWeatherState, args: IWeatherData): Partial<IWeatherState>
 	{
 		return {
-            gridState: WeatherGridState.loaded,
-            error: null,
-            content: args.content
+			gridState: WeatherGridState.loaded,
+			error: null,
+			content: args.content
 		};
 	}
 }

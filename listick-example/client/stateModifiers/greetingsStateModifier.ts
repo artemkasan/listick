@@ -1,9 +1,9 @@
 export interface IGreetingsState
 {
-    lastName: string
+	lastName: string
 }
 
 export class GreetingsStateModifier
 {
-    initialState: IGreetingsState = { lastName: "Smith" }
+	initialState: IGreetingsState = { lastName: "Smith" }
 }
