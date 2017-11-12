@@ -11,20 +11,19 @@ export interface IWeatherState
 {
 	gridState: WeatherGridState;
 	error: string | null;
-	content: Array<{ id: number, name: string, degree: number }>;
+	content: Array<{ id: number, name: string, degree: number }> | null;
 }
 
 export class WeatherStateModifier
 {
-	initialState: IWeatherState = { gridState: WeatherGridState.notInitialized, error: null, content: [] };
+	initialState: IWeatherState = { gridState: WeatherGridState.notInitialized, error: null, content: null };
 
 	@subscribe(WeatherEvents, es => es.startLoading)
 	public onStartLoading(prevState: IWeatherState, args: boolean): Partial<IWeatherState>
 	{
 		return {
 			gridState: WeatherGridState.loading,
-			error: null,
-			content: []
+			error: null
 		};
 	}
 
@@ -33,7 +32,8 @@ export class WeatherStateModifier
 	{
 		return {
 			gridState: WeatherGridState.loaded,
-			error: args
+			error: args,
+			content: []
 		};
 	}
 

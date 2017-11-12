@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Navigation from './navigation';
-import { Sidebar, Menu, Segment, Container } from 'semantic-ui-react';
+import { Segment, Container } from 'semantic-ui-react';
 
 export default class Layout extends React.Component<{}, {}>
 {
@@ -13,17 +13,18 @@ export default class Layout extends React.Component<{}, {}>
 				body > div > div > div.main-layout {
 					height: 100%;
 				}
+				.main {
+					margin-left: 150px;
+				}
 			`}</style>
-			<Sidebar.Pushable>
-				<Navigation />
-				<Sidebar.Pusher>
-					<Container>
+			<Navigation />
+			<div className="main">
+				<Container>
 					<Segment basic>
 						{this.props.children}
 					</Segment>
-					</Container>
-				</Sidebar.Pusher>
-			</Sidebar.Pushable>
+				</Container>
+			</div>
 		</div>;
 	}
 }
