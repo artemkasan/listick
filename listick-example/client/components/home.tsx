@@ -1,11 +1,13 @@
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
-import Counter from "./Counter";
+import Greetings from './greetings';
 
 export default class Home extends React.Component<RouteComponentProps<any>, {}>
 {
 	public render()
 	{
-		return <div>Hello world <Counter text="John"></Counter></div>;
+		return <div><h1>Greeting by Listick</h1>
+			<Greetings firstName="John"></Greetings>
+		</div>;
 	}
 };
