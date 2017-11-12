@@ -4,6 +4,7 @@ import { Sidebar, Menu, Segment, Container } from 'semantic-ui-react';
 
 export default class Layout extends React.Component<{}, {}>
 {
+<<<<<<< HEAD
 	public render()
 	{
 		return <div className="main-layout">
@@ -26,4 +27,28 @@ export default class Layout extends React.Component<{}, {}>
 			</Sidebar.Pushable>
 		</div>;
 	}
+=======
+    public render()
+    {
+        return <div className="main-layout">
+            <style>{`
+                body > div,
+                body > div > div,
+                body > div > div > div.main-layout {
+                    height: 100%;
+                }
+            `}</style>
+            <Sidebar.Pushable>
+                <Navigation />
+                <Sidebar.Pusher>
+                    <Container>
+                    <Segment basic>
+                        {this.props.children}
+                    </Segment>
+                    </Container>
+                </Sidebar.Pusher>
+            </Sidebar.Pushable>
+        </div>;
+    }
+>>>>>>> a276043329595351a1a98b96d0572a8713ca891e
 }
