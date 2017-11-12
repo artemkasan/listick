@@ -29,6 +29,7 @@
     "history": "~4.7.2",
     "listick": "../listick/listick-v0.1.0.tgz",
     "listick-react": "../listick-react/listick-react-v0.1.0.tgz",
+    "listick-devtools": "../listick-devtools/listick-devtools-v0.1.0.tgz",
     "react": "~16.0.0",
     "react-dom": "~16.0.0",
     "react-router-dom": "~4.2.2",

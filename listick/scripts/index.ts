@@ -6,4 +6,6 @@ export { store } from "./decorators/StoreDecorator";
 export { subscribe} from "./decorators/SubscribeDecorator";
 export { buildStore } from "./core/BuildStore";
 export { Store } from "./core/Store";
+export { Type } from "./core/Type";
 export { IStateModifier } from "./core/IStateModifier";
+export { Dispatcher } from "./core/Dispatcher";

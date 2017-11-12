@@ -8,13 +8,19 @@ yarn pack
 
 Write-Output "Build and pack listick-react"
 Set-Location ../listick-react
-yarn
+yarn install --force
+yarn build
+yarn pack
+
+Write-Output "Build and pack listick-devtools"
+Set-Location ../listick-devtools
+yarn install --force
 yarn build
 yarn pack
 
 Write-Output "Build and pack listick-example"
 Set-Location ../listick-example
-yarn
+yarn install --force
 yarn build
 
 Pop-Location

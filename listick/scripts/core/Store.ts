@@ -10,7 +10,7 @@ type StoreState<T> = keyof T;
 
 export class Store<T>
 {
-	public stateChanged: SimpleEvent<T> = new SimpleEvent<T>();
+	public stateChanged: SimpleEvent<{ name: string, newState:T}> = new SimpleEvent<{ name: string, newState:T}>();
 
 	private serviceInjector: ServiceProvider;
 	private eventContainers: any[] = [];
@@ -35,13 +35,26 @@ export class Store<T>
 		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(MetadataKeys.storeOwnStates, storeType.prototype);
 		for (const storeProperty of ownStates)
 		{
-			this.initializeStateModifier(storeInstance, storeType, storeProperty);
+			const stateModifierType: Type<IStateModifier<any>> = Reflect.getMetadata(
+				MetadataKeys.stateStateModifier,
+				storeType.prototype,
+				storeProperty);
+	
+			this.initializeStateModifier(storeInstance, stateModifierType, storeProperty);
 		}
 	}
 
 	public getStore(): T
 	{
-		return this.storeInstance;
+		return {
+			...this.storeInstance;
+		}
+	}
+
+	public setStore(value: T)
+	{
+		this.storeInstance = value;
+		this.onStateChanged("setStore");
 	}
 
 	public getService<TService>(serviceType: Type<TService>): TService
@@ -55,12 +68,62 @@ export class Store<T>
 		return service;
 	}
 
-	private initializeStateModifier<K extends keyof T>(storeInstance: T, storeType: Type<T>, storeProperty: K): void
+	public getEvent<TEvent>(eventType: Type<TEvent>): TEvent
 	{
-		const stateModifierType: Type<IStateModifier<T[K]>> = Reflect.getMetadata(
-			MetadataKeys.stateStateModifier,
-			storeType.prototype,
-			storeProperty);
+		const requestedEvent = this.eventContainers.find(x => x instanceof eventType) as TEvent;
+		if(requestedEvent === undefined)
+		{
+			console.error(`Event ${eventType} is undefined.`);
+			throw new Error(`Service ${eventType} is undefined.`);
+		}
+
+		return requestedEvent;
+	}
+
+	public subscribe<K extends keyof T, TArgs>(
+		storeProperty:K,
+		eventHandler: SimpleEvent<TArgs>,
+		stateModifierItem: (prevState:T[K], args: TArgs) => T[K],
+		stateModifierPropertyName: string)
+	{
+		eventHandler.add((sender, args) =>
+		{
+			const prevState = this.storeInstance[storeProperty] as any;
+			const newState = stateModifierItem(prevState, args) as any
+			if(newState === undefined)
+			{
+				throw new Error(`function ${stateModifierPropertyName} returns undefined state which is not acceptable`);
+			}
+
+			const newStorePropertyValue;
+			if(this.isObject(prevState))
+			{
+				newStorePropertyValue = 
+				{
+					...prevState,
+					...newState
+				};
+			}
+			else
+			{
+				newStorePropertyValue = newState;
+			}
+
+			const newStoreState = this.storeInstance as any;
+			this.storeInstance = {
+				...newStoreState,
+			};
+
+			this.storeInstance[storeProperty] = newStorePropertyValue;
+			this.onStateChanged(stateModifierPropertyName);
+		});
+	}
+
+	private initializeStateModifier<K extends keyof T>(
+		storeInstance: T,
+		stateModifierType: Type<IStateModifier<any>>,
+		storeProperty: K): void
+	{
 		const stateModifier = new stateModifierType();
 		if (storeInstance[storeProperty] === undefined)
 		{
@@ -86,26 +149,8 @@ export class Store<T>
 
 				const eventContainerInstance = this.getEventContainerInstance(eventResolver.eventContainer);
 				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
-				const stateModifierProperty = (stateModifier as any)[stateModifierPropertyName];
 				const stateModifierItem = (stateModifier as any)[stateModifierPropertyName] as (prevState: any, args: any) => any;
-				eventHandler.add((sender, args) =>
-				{
-					const prevState = storeInstance[storeProperty] as any;
-					const newState = stateModifierItem(prevState, args)
-					if(this.isObject(prevState))
-					{
-						storeInstance[storeProperty] = 
-						{
-							...prevState,
-							...newState
-						};
-					}
-					else
-					{
-						storeInstance[storeProperty] = newState;
-					}
-					this.onStateChanged();
-				});
+				this.subscribe(storeProperty, eventHandler, stateModifierItem, stateModifierPropertyName);
 			}
 		}
 	}
@@ -115,9 +160,9 @@ export class Store<T>
 		return typeof value === "object";
 	}
 
-	private onStateChanged(): void
+	private onStateChanged(eventName: string): void
 	{
-		this.stateChanged.fire(this, this.storeInstance);
+		this.stateChanged.fire(this, { name: eventName, newState: this.storeInstance });
 	}
 
 	private getEventContainerInstance<TType>(eventContainerType: EventContainerType<TType>): TType

@@ -1,0 +1,21 @@
+{
+  "name": "listick-devtools",
+  "version": "0.1.0",
+  "description": "Listick development tools",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/artemkasan/listick",
+  "author": "Artem Labutin",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [
+    "listick",
+    "development"
+  ],
+  "dependencies": {
+    "listick": "../listick/listick-v0.1.0.tgz"
+  }
+}
