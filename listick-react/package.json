@@ -19,15 +19,15 @@
   "author": "Artem Labutin",
   "license": "MIT",
   "dependencies": {
-    "prop-types": "15.6.0",
-    "react": "16.0.0",
-    "reflect-metadata": "0.1.10",
+    "prop-types": "^15.6.0",
+    "react": "^16.1.1",
+    "reflect-metadata": "^0.1.10",
     "listick": "../listick/listick-v0.1.0.tgz"
   },
   "devDependencies": {
-    "@types/prop-types": "15.5.2",
-    "@types/react": "16.0.19",
-    "eslint": "4.10.0",
-    "typescript": "2.6.3"
+    "@types/prop-types": "^15.5.2",
+    "@types/react": "^16.0.22",
+    "eslint": "^4.11.0",
+    "typescript": "^2.6.1"
   }
 }
