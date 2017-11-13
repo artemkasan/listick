@@ -13,6 +13,11 @@ export type SubscribeDecorator<TArgs> = <TState>(
 	descriptor: TypedPropertyDescriptor<StateModifierItem<TState, TArgs>>) 
 		=> TypedPropertyDescriptor<StateModifierItem<TState, TArgs>> | void;
 
+/**
+ * Marks state modifier method that it can listen to event container event.
+ * @param eventContainer Event container to listen.
+ * @param getEventCallback Callback that returns Simple event that can be listened.
+ */
 export function subscribe<TEvent, TArgs>(
 	eventContainer: Type<TEvent>,
 	getEventCallback: GetEventCallback<TEvent, TArgs>)

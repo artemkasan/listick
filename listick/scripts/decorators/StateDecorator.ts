@@ -4,6 +4,10 @@ import * as MetadataKeys from "../core/MetadataKeys";
 import {IStateModifier} from '../core/IStateModifier';
 import {Type} from "../core/Type";
 
+/**
+ * Marks store property that it is state that can be changed.
+ * @param stateModifier State modifier prototype.
+ */
 export function state<T extends IStateModifier<any>>(stateModifier: Type<T>): PropertyDecorator
 {
 	return (

@@ -11,18 +11,18 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 	}
 
 	const devTools = devToolsExtension.connect();
-	const initValue = store.getStore();
+	const initValue = store.getStoreState();
 	
 	const reset = async () =>
 	{
-		await Dispatcher.currentDispatcher.invoke(() => store.setStore(initValue));
-		Dispatcher.currentDispatcher.invoke(() => devTools.init(store.getStore()));
+		await Dispatcher.currentDispatcher.invoke(() => store.setStoreState(initValue));
+		Dispatcher.currentDispatcher.invoke(() => devTools.init(store.getStoreState()));
 	};
 
 	const rollback = async (prevState: string) =>
 	{
-		await Dispatcher.currentDispatcher.invoke(() =>store.setStore(JSON.parse(prevState)));
-		devTools.init(store.getStore());
+		await Dispatcher.currentDispatcher.invoke(() =>store.setStoreState(JSON.parse(prevState)));
+		devTools.init(store.getStoreState());
 	}
 
 	const importState = async(payload: any) =>
@@ -30,7 +30,7 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 		const { nextLiftedState } = payload;
 		const { computedStates } = nextLiftedState;
 		await Dispatcher.currentDispatcher.invoke(() =>
-			store.setStore(computedStates[computedStates.length - 1].state));
+			store.setStoreState(computedStates[computedStates.length - 1].state));
 		devTools.send(null, nextLiftedState);
 	}
 
@@ -46,7 +46,7 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 					reset();
 					return;
 				case "COMMIT":
-					devTools.init(store.getStore());
+					devTools.init(store.getStoreState());
 					return;
 				case "ROLLBACK":
 					rollback(message.state);
@@ -54,7 +54,7 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 				case "JUMP_TO_STATE":
 				case "JUMP_TO_ACTION":
 					Dispatcher.currentDispatcher.invoke(() =>
-						store.setStore(JSON.parse(message.state)));
+						store.setStoreState(JSON.parse(message.state)));
 					return;
 				case "TOGGLE_ACTION":
 					return;

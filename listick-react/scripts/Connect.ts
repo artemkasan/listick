@@ -45,7 +45,7 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 				...requestedServices
 			];
 			target.apply(pThis, targetArgs);
-			pThis.state = stateGet(store.getStore());
+			pThis.state = stateGet(store.getStoreState());
 		}
 
 		const connector = new Function(
@@ -59,7 +59,7 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 		{
 			subscribedFunction = (sender: any, args: any) =>
 			{
-				this.setState(stateGet(store.getStore()));
+				this.setState(stateGet(store.getStoreState()));
 			};
 			store.stateChanged.add(subscribedFunction)
 		};
