@@ -17,5 +17,8 @@
   ],
   "dependencies": {
     "listick": "../listick/listick-v0.1.0.tgz"
+  },
+  "devDependencies": {
+    "typescript": "2.6.1"
   }
 }
