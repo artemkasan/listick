@@ -156,7 +156,10 @@ export default class Counter extends React.Component<ICounterProps, ICounterStat
 
     public render()
     {
-        return <div>{this.props.text}<br/> Counter: {this.state.counter} <button onClick={() => this.onIncrement()} >Increment</button> <button onClick={() => this.onDecrement()} >Decrement</button></div>;
+        return <div>{this.props.text}<br/>
+            Counter: {this.state.counter} 
+            <button onClick={() => this.onIncrement()} >Increment</button>
+            <button onClick={() => this.onDecrement()} >Decrement</button></div>;
     }
 
     private onIncrement()
