@@ -1,6 +1,10 @@
 import { CounterEvents } from "../events/counterEvents";
 import { inject } from "listick";
 
+/**
+ * Simple service with two methods which fire two events
+ * increment and decrement.
+ */
 @inject export class CounterService
 {
 	constructor(private counterEvents: CounterEvents)

@@ -6,6 +6,9 @@ export interface ICounterState
 	counter: number;
 }
 
+/**
+ * State modifier for example with counter.
+ */
 export class CounterStateModifier
 {
 	initialState: ICounterState = { counter: 2 };
@@ -14,7 +17,6 @@ export class CounterStateModifier
 	public onIncrement(prevState: ICounterState, args: number): Partial<ICounterState>
 	{
 		return {
-			...prevState,
 			counter: prevState.counter + args
 		};
 	}
@@ -23,7 +25,6 @@ export class CounterStateModifier
 	public onDecrement(prevState: ICounterState, args: number): Partial<ICounterState>
 	{
 		return {
-			...prevState,
 			counter: prevState.counter - args
 		}
 	}

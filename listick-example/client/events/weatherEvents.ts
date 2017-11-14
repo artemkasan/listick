@@ -5,6 +5,9 @@ export interface IWeatherData
 	content: Array<{ id: number, name: string; degree: number;}>
 }
 
+/**
+ * Weather specific events.
+ */
 export class WeatherEvents
 {
 	public startLoading: SimpleEvent<boolean> = new SimpleEvent<boolean>();

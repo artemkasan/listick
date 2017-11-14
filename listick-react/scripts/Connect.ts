@@ -38,16 +38,21 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 			// Collect all services requested by constructor.
 			const requestedServices: any[] = [];
 			store = context.store as Store<any>;
-			for (let i = 2; i < inputArgs.length; i++)
+			// if there is no constructor in component input args will be undefined.
+			if(inputArgs !== undefined)
 			{
-				const service = store.getService(inputArgs[i]);
-				if (service === undefined)
+				for (let i = 2; i < inputArgs.length; i++)
 				{
-					console.error(`Service ${inputArgs[i]} is not registered in store`);
-				}
+					const service = store.getService(inputArgs[i]);
+					if (service === undefined)
+					{
+						console.error(`Service ${inputArgs[i]} is not registered in store`);
+					}
 
-				requestedServices.push(service);
+					requestedServices.push(service);
+				}
 			}
+
 			const targetArgs: any[] = [
 				props,
 				context,

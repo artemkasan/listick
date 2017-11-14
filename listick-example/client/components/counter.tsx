@@ -10,6 +10,14 @@ import { Button, Progress } from "semantic-ui-react";
 @connect<RouteComponentProps<any>, ICounterState>((store: AppStore) => store.counterState)
 export default class Counter extends React.Component<RouteComponentProps<any>, ICounterState>
 {
+	/**
+	 * Creates new instance of counter component. Here we have to set service with ? sign
+	 * because router uses wrong React.Component declaration and do not allows to use it
+	 * directly.
+	 * @param props React props
+	 * @param context React context
+	 * @param counterService Service that is injected by connect decorator.
+	 */
 	constructor(props: RouteComponentProps<any>, context?: any,
 		private counterService?: CounterService)
 	{
