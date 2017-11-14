@@ -62,10 +62,10 @@ export class Store<T>
 	 * Sets current store state.
 	 * @param value New store state.
 	 */
-	public setStoreState(value: T)
+	public setStoreState(value: T, reason?: string)
 	{
 		this.storeInstance = value;
-		this.onStateChanged("setStore");
+		this.onStateChanged(reason || "setStore");
 	}
 
 	/**
