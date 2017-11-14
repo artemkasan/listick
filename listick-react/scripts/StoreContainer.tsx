@@ -8,26 +8,17 @@ export interface IStoreContainerProps
 	store: Store<any>;
 }
 
-export interface IStoreContainerState
+/**
+ * Root object which allows to connect child react components to the Listik store.
+ */
+export default class StoreContainer extends React.Component<IStoreContainerProps, {}>
 {
-	store: Store<any>;
-}
-
-export default class StoreContainer extends React.Component<IStoreContainerProps, IStoreContainerState>
-{
+	/**
+	 * Set Listick store as context of React child components.
+	 */
 	public static childContextTypes = {
 		store: PropTypes.object.isRequired,
 	};
-
-	constructor(props: IStoreContainerProps, context?: any)
-	{
-		super(props, context);
-		this.state = {
-			store: props.store,
-		};
-
-		this.state.store.stateChanged.add((sender, args) => this.onStateChanged(sender, args));
-	}
 
 	public getChildContext()
 	{
@@ -39,12 +30,5 @@ export default class StoreContainer extends React.Component<IStoreContainerProps
 	public render()
 	{
 		return React.Children.only(this.props.children);
-	}
-
-	private onStateChanged(sender: any, args: any)
-	{
-		this.setState({
-			store: this.state.store,
-		});
 	}
 }
