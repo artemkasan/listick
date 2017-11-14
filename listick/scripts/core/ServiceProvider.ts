@@ -2,6 +2,9 @@
 import { EventContainerType, ServiceType } from "../decorators/StoreOptions";
 import { Type } from "./Type";
 
+/**
+ * This class controls access to services.
+ */
 export class ServiceProvider
 {
 	private serviceInstances: any[] = [];
@@ -12,6 +15,10 @@ export class ServiceProvider
 	{
 	}
 
+	/**
+	 * Searches for a service or undefined if it was not found.
+	 * @param type Required service type.
+	 */
 	public getService<T>(type: Type<T>): T | undefined
 	{
 		const requestedService = this.serviceInstances.find(x => x instanceof type) as T;
@@ -51,13 +58,5 @@ export class ServiceProvider
 		this.serviceInstances.push(serviceInstance);
 
 		return serviceInstance;
-	}
-
-	private resolveService<T>(type: Type<T>): T | undefined
-	{
-		if (this.services === undefined)
-		{
-			return undefined;
-		}
 	}
 }

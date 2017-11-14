@@ -19,6 +19,7 @@ const appStore = buildStore(AppStore);
 const baseUrl: string = document.getElementsByTagName("base")[0].getAttribute("href")!;
 const history = createBrowserHistory({ basename: baseUrl });
 
+// subscribe redux-dev-tools to watch for Listick store.
 subscribeDevTools(appStore);
 
 ReactDOM.render(

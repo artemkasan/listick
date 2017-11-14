@@ -1,20 +1,27 @@
 ﻿
 type DispatcherAction = () => void;
 
+/**
+ * Dispatcher which forces to do all actions one by one.
+ */
 export class Dispatcher
 {
 	private invokeSubject: DispatcherAction[] = [];
 	private static _currentDispatcher: Dispatcher = new Dispatcher();
 
-	private constructor()
-	{
-	}
-
+	/**
+	 * Gets current dispatcher.
+	 */
 	public static get currentDispatcher(): Dispatcher
 	{
 		return this._currentDispatcher;
 	}
 
+	/**
+	 * Invokes some code in queue of dispatcher.
+	 * @param callback that must be invoked.
+	 * @returns Promise that will be finished when callback successfully executed.
+	 */
 	public invoke<TArgs, TResult>(callback: () => void): Promise<void>
 	{
 		return new Promise<void>((resolve, reject) =>
@@ -36,11 +43,17 @@ export class Dispatcher
 		});
 	}
 
+	/**
+	 * Starts new queue of actions processing.
+	 */
 	private startProcessingActions()
 	{
 		setTimeout(() => this.processAction(), 1);
 	}
 
+	/**
+	 * Process one action from queue.
+	 */
 	private processAction()
 	{
 		try

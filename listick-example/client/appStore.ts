@@ -8,6 +8,9 @@ import { IWeatherState, WeatherStateModifier } from "./stateModifiers/weatherSta
 import { WeatherEvents } from "./events/weatherEvents";
 import { WeatherService } from "./services/weatherService";
 
+/**
+ * Here we define application store with three states.
+ */
 @store({
 	eventContainers: [CounterEvents, WeatherEvents],
 	services: [CounterService, WeatherService]

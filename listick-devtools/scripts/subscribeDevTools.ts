@@ -2,6 +2,7 @@ import { Store, Dispatcher } from "listick";
 
 export function subscribeDevTools<TState>(store: Store<TState>)
 {
+	const devToolsStateChangeReason = "__DEVTOOLS__";
 	const windowIfDefined = typeof window === 'undefined' ? null : window as any;
 	// If devTools is installed, connect to it
 	const devToolsExtension = windowIfDefined && windowIfDefined.__REDUX_DEVTOOLS_EXTENSION__;
@@ -11,32 +12,34 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 	}
 
 	const devTools = devToolsExtension.connect();
-	const initValue = store.getStore();
+	// store initial state to do reset when it requested by devtools.
+	const initValue = store.getStoreState();
 	
 	const reset = async () =>
 	{
-		await Dispatcher.currentDispatcher.invoke(() => store.setStore(initValue));
-		Dispatcher.currentDispatcher.invoke(() => devTools.init(store.getStore()));
+		// first complete state change and then set new value to devtools.
+		await Dispatcher.currentDispatcher.invoke(() => store.setStoreState(initValue, devToolsStateChangeReason));
+		Dispatcher.currentDispatcher.invoke(() => devTools.init(store.getStoreState()));
 	};
 
 	const rollback = async (prevState: string) =>
 	{
-		await Dispatcher.currentDispatcher.invoke(() =>store.setStore(JSON.parse(prevState)));
-		devTools.init(store.getStore());
+		await Dispatcher.currentDispatcher.invoke(() =>store.setStoreState(JSON.parse(prevState), devToolsStateChangeReason));
+		devTools.init(store.getStoreState());
 	}
 
-	const importState = async(payload: any) =>
+	const importState = async (payload: any) =>
 	{
 		const { nextLiftedState } = payload;
 		const { computedStates } = nextLiftedState;
 		await Dispatcher.currentDispatcher.invoke(() =>
-			store.setStore(computedStates[computedStates.length - 1].state));
+			store.setStoreState(computedStates[computedStates.length - 1].state, devToolsStateChangeReason));
 		devTools.send(null, nextLiftedState);
 	}
 
 	devTools.init(initValue);
 
-	const unsubscribe = devTools.subscribe((message : any) =>
+	devTools.subscribe((message : any) =>
 	{
 		if(message.type === "DISPATCH")
 		{
@@ -46,7 +49,7 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 					reset();
 					return;
 				case "COMMIT":
-					devTools.init(store.getStore());
+					devTools.init(store.getStoreState());
 					return;
 				case "ROLLBACK":
 					rollback(message.state);
@@ -54,9 +57,10 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 				case "JUMP_TO_STATE":
 				case "JUMP_TO_ACTION":
 					Dispatcher.currentDispatcher.invoke(() =>
-						store.setStore(JSON.parse(message.state)));
+						store.setStoreState(JSON.parse(message.state), devToolsStateChangeReason));
 					return;
 				case "TOGGLE_ACTION":
+					// TODO: For now not clear how to invoke it. Implement it later
 					return;
 				case "IMPORT_STATE":
 					importState(message.payload);
@@ -67,6 +71,10 @@ export function subscribeDevTools<TState>(store: Store<TState>)
 
 	store.stateChanged.add((sender, args) =>
 	{
-		devToolsExtension.send(args.name, args.newState);
+		// save new state to dev tools if it was not invoked by devtools.
+		if(args.name != devToolsStateChangeReason)
+		{
+			devToolsExtension.send(args.name, args.newState);
+		}
 	});
 }

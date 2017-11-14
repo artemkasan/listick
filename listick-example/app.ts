@@ -11,16 +11,19 @@ function getDegree() : number
 	return Math.round(Math.random() * (max - min) + min);
 }
 
+// return static source files from dist
 app.get('/dist/*',(req, res) =>
 {
 	console.log('static file request : ' + req.params[0]);
 	res.sendFile(path.join(__dirname, 'dist', req.params[0]));
 });
 
+// here we specify all possible request which is used by react routing on client.
 app.get(['/', '/home', '/counter', '/weather', ], (req, res) => {
 	res.sendFile(path.join(__dirname, '/client/index.html'))
 	});
 
+// example api request for weather data.
 app.get('/api/weather', (req, res) => {
 	setTimeout(() =>
 	{

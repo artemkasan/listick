@@ -8,14 +8,13 @@ export interface IGreetingsProps
 	firstName: string
 }
 
+/**
+ * This component shows correct work when component has input parameters
+ * and uses connect decorator.
+ */
 @connect<IGreetingsProps, IGreetingsState>((store: AppStore) => store.greetingState)
 export default class Greetings extends React.Component<IGreetingsProps, IGreetingsState>
 {
-	constructor(props: IGreetingsProps, context?: any)
-	{
-		super(props, context);
-	}
-
 	public render()
 	{
 		return <div style={{ fontWeight: 700}} >Hallo {this.props.firstName} {this.state.lastName}</div>;
