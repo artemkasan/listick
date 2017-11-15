@@ -31,8 +31,4 @@ Remove-Item yarn.lock -Force -ErrorAction Ignore
 Remove-Item app.js -Force -ErrorAction Ignore
 Remove-Item app.js.map -Force -ErrorAction Ignore
 
-Write-Output "Clean yarn cache"
-yarn cache clean listick
-yarn cache clean listick-react
-
 Pop-Location

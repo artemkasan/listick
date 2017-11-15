@@ -22,7 +22,7 @@
     "prop-types": "^15.6.0",
     "react": "^16.1.1",
     "reflect-metadata": "^0.1.10",
-    "listick": "../listick/listick-v0.1.0.tgz"
+    "listick": "file:../listick/"
   },
   "devDependencies": {
     "@types/prop-types": "^15.5.2",
