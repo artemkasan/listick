@@ -10,7 +10,7 @@ import { buildStore } from "listick";
 import { StoreContainer } from "listick-react";
 import { subscribeDevTools } from "listick-devtools";
 
-import { AppStore } from "./AppStore";
+import { AppStore } from "./appStore";
 import { Container } from "semantic-ui-react";
 
 let routes = RoutesModule.routes;

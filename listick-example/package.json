@@ -8,7 +8,7 @@
     "build:client": "node_modules/.bin/webpack",
     "build:server": "tsc app.ts",
     "build": "yarn build:vendors && yarn build:client && yarn build:server",
-    "start:browser": "node_modules\\.bin\\opn http://localhost:3000 --'google chrome' --incognito",
+    "start:browser": "node_modules/.bin/opn http://localhost:3000 --'google chrome' --incognito",
     "start": "yarn start:browser && node app.js"
   },
   "repository": {
