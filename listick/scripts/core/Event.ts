@@ -5,7 +5,7 @@ export type EventCallback<TArgs> = (sender: any, args: TArgs) => void;
 /**
  * Represents object that can notify multiple targets.
  */
-export class SimpleEvent<TArgs>
+export class Event<TArgs>
 {
 	private handlers: Array<EventCallback<TArgs>> = [];
 

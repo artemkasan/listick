@@ -1,4 +1,4 @@
-import { SimpleEvent } from "listick";
+import { Event } from "listick";
 
 export interface IWeatherData
 {
@@ -10,9 +10,9 @@ export interface IWeatherData
  */
 export class WeatherEvents
 {
-	public startLoading: SimpleEvent<boolean> = new SimpleEvent<boolean>();
+	public startLoading = new Event<boolean>();
 	
-	public loadingFailed: SimpleEvent<string> = new SimpleEvent<string>();
+	public loadingFailed = new Event<string>();
 
-	public updateWeather: SimpleEvent<IWeatherData> = new SimpleEvent<IWeatherData>();
+	public updateWeather = new Event<IWeatherData>();
 }

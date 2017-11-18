@@ -52,9 +52,9 @@ Events container are classes that combine several events by one common idea
 ```ts
 export class CounterEvents
 {
-    public increment: SimpleEvent<number> = new SimpleEvent<number>();
+    public increment = new Event<number>();
 
-    public decrement: SimpleEvent<number> = new SimpleEvent<number>();
+    public decrement = new Event<number>();
 }
 ```
 
@@ -175,5 +175,11 @@ export default class Counter extends React.Component<ICounterProps, ICounterStat
 ```
 
 Here we use **@connect** decorator to bind state and services to React component. This component use Listick state as own. You do not need to modify the state manually, it will be done by Listick. All services can be injected in constructor and used inside React component as field.
+
+## Using of Redux Development Tools
+You can use redux development tools with listick. All you need to include **listick-devtools** into the project. and add link to dev tool for specified store.
+```ts
+subscribeDevTools(appStore);
+``
 
 You can try to run listick-example and check how it works.

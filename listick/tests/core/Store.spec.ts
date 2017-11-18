@@ -1,14 +1,14 @@
 import "mocha";
 
-import { inject, state, store, subscribe, buildStore, SimpleEvent } from '../../scripts';
+import { inject, state, store, subscribe, buildStore, Event } from '../../scripts';
 import { assert } from "chai";
 
 describe("Instantiating store", () =>
 {
 	class CounterEvents
 	{
-		public increment: SimpleEvent<number> = new SimpleEvent<number>();
-		public decrement: SimpleEvent<number> = new SimpleEvent<number>();
+		public increment = new Event<number>();
+		public decrement = new Event<number>();
 	}
 
 	@inject class CounterService
@@ -60,10 +60,10 @@ describe("Instantiating store", () =>
 		const store = buildStore(MyStore);
 		store.stateChanged.add(() =>
 		{
-			assert.equal(3, store.getStore().counter.count, "store state was not updated");
+			assert.equal(3, store.getStoreState().counter.count, "store state was not updated");
 			done();
 		});
-		assert.equal(2, store.getStore().counter.count, "initial value for store was not applied");
+		assert.equal(2, store.getStoreState().counter.count, "initial value for store was not applied");
 		const counterService = store.getService(CounterService);
 		counterService.increment();
 	});
@@ -93,10 +93,10 @@ describe("Instantiating store", () =>
 		const simpleStore = buildStore(SimpleStore);
 		simpleStore.stateChanged.add(() =>
 		{
-			assert.equal(1, simpleStore.getStore().count, "store state was not updated");
+			assert.equal(1, simpleStore.getStoreState().count, "store state was not updated");
 			done();
 		});
-		assert.equal(0, simpleStore.getStore().count, "initial value for store was not applied");
+		assert.equal(0, simpleStore.getStoreState().count, "initial value for store was not applied");
 		const counterService = simpleStore.getService(CounterService);
 		counterService.increment();
 	});
@@ -134,11 +134,11 @@ describe("Instantiating store", () =>
 		const simpleStore = buildStore(SimpleStore);
 		simpleStore.stateChanged.add(() =>
 		{
-			assert.equal(1, simpleStore.getStore().simple.count, "store state was not updated");
-			assert.equal("John", simpleStore.getStore().simple.name, "parameter name has changed, but must be old");
+			assert.equal(1, simpleStore.getStoreState().simple.count, "store state was not updated");
+			assert.equal("John", simpleStore.getStoreState().simple.name, "parameter name has changed, but must be old");
 			done();
 		});
-		assert.equal(0, simpleStore.getStore().simple.count, "initial value for store was not applied");
+		assert.equal(0, simpleStore.getStoreState().simple.count, "initial value for store was not applied");
 		const counterService = simpleStore.getService(CounterService);
 		counterService.increment();
 	});

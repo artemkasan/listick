@@ -6,17 +6,17 @@ import { AppStore } from '../appStore';
 import { WeatherService } from '../services/weatherService';
 import { IWeatherState, WeatherGridState } from '../stateModifiers/weatherStateModifier';
 
-/**
- * Creates new instance of weather component. Here we have to set service with ? sign
- * because router uses wrong React.Component declaration and do not allows to use it
- * directly.
- * @param props React props
- * @param context React context
- * @param weatherService Service that is injected by connect decorator.
- */
 @connect<RouteComponentProps<any>, IWeatherState>((store: AppStore) => store.weatherState)
 export default class Weather extends React.Component<RouteComponentProps<any>, IWeatherState> {
 
+	/**
+	 * Creates new instance of counter component. Here we have to set service with ? sign
+	 * because React typings specify constructor with two arguments and router uses it
+	 * we have to set counterService as optional and later set ! mark when we call it.
+	 * @param props React props
+	 * @param context React context
+	 * @param weatherService Service that is injected by connect decorator.
+	 */
 	constructor(props:RouteComponentProps<any>, context?: any,
 		private weatherService?: WeatherService)
 	{
