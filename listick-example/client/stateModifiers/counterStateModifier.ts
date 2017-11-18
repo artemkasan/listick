@@ -1,4 +1,4 @@
-import { subscribe, SimpleEvent } from "listick";
+import { subscribe } from "listick";
 import { CounterEvents } from "../events/counterEvents";
 
 export interface ICounterState

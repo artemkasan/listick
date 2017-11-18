@@ -1,5 +1,5 @@
 ﻿import { EventContainerType, IStoreOptions } from "../decorators/StoreOptions";
-import { SimpleEvent } from "../events/SimpleEvent";
+import { Event } from "../core/Event";
 import { IGetEventCallbackInfo } from "./GetEventCallbackInfo";
 import * as MetadataKeys from "./MetadataKeys";
 import { ServiceProvider } from "./ServiceProvider";
@@ -16,7 +16,7 @@ export class Store<T>
 	/**
 	 * This event is fired when state of current store has changed.
 	 */
-	public stateChanged: SimpleEvent<{ name: string, newState:T}> = new SimpleEvent<{ name: string, newState:T}>();
+	public stateChanged = new Event<{ name: string, newState:T}>();
 
 	private serviceInjector: ServiceProvider;
 	private eventContainers: any[] = [];
@@ -109,7 +109,7 @@ export class Store<T>
 	 */
 	private subscribe<K extends keyof T, TArgs>(
 		storeProperty:K,
-		eventHandler: SimpleEvent<TArgs>,
+		eventHandler: Event<TArgs>,
 		stateModifierItem: (prevState:T[K], args: TArgs) => T[K],
 		stateModifierPropertyName: string)
 	{

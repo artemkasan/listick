@@ -1,4 +1,4 @@
-import { subscribe, SimpleEvent } from "listick";
+import { subscribe } from "listick";
 import { WeatherEvents, IWeatherData } from "../events/weatherEvents";
 
 export enum WeatherGridState

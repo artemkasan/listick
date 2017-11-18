@@ -12,8 +12,8 @@ export default class Counter extends React.Component<RouteComponentProps<any>, I
 {
 	/**
 	 * Creates new instance of counter component. Here we have to set service with ? sign
-	 * because router uses wrong React.Component declaration and do not allows to use it
-	 * directly.
+	 * because React typings specify constructor with two arguments and router uses it
+	 * we have to set counterService as optional and later set ! mark when we call it.
 	 * @param props React props
 	 * @param context React context
 	 * @param counterService Service that is injected by connect decorator.

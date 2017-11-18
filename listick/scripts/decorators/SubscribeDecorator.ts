@@ -4,7 +4,7 @@ import { GetEventCallback } from "../core/GetEventCallbackInfo";
 import * as MetadataKeys from "../core/MetadataKeys";
 import { Type } from "../core/Type";
 import { IStateModifier } from "../core/IStateModifier";
-import { SimpleEvent } from "../events/SimpleEvent";
+import { Event } from "../core/Event";
 
 export type StateModifierItem<TState, TArgs> = (prevState: TState, args: TArgs) => Partial<TState> | TState;
 export type SubscribeDecorator<TArgs> = <TState>(
