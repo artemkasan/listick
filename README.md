@@ -180,6 +180,6 @@ Here we use **@connect** decorator to bind state and services to React component
 You can use redux development tools with listick. All you need to include **listick-devtools** into the project. and add link to dev tool for specified store.
 ```ts
 subscribeDevTools(appStore);
-``
+```
 
 You can try to run listick-example and check how it works.
