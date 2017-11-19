@@ -37,22 +37,26 @@ export class Event<TArgs>
 	}
 
 	/**
-	 * Notifies listeners about changes.
+	 * Notifies listeners.
 	 * @param sender event initiator.
 	 * @param args event arguments to send.
+	 * @returns Promise that will be finished when all targets process event.
 	 */
 	public async fire(sender: any, args: TArgs): Promise<void>
 	{
+		const waitAll: Array<Promise<void>> = [];
 		for (const callback of this.handlers)
 		{
 			try
 			{
-				await Dispatcher.currentDispatcher.invoke(() => callback(sender, args));
+				waitAll.push(Dispatcher.currentDispatcher.invoke(() => callback(sender, args)));
 			}
 			catch (e)
 			{
 				console.dir(e);
 			}
 		}
+
+		await Promise.all(waitAll);
 	}
 }

@@ -39,14 +39,21 @@ export class Store<T>
 		this.serviceInjector = new ServiceProvider(this.eventContainers, storeOptions.services);
 
 		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(MetadataKeys.storeOwnStates, storeType.prototype);
-		for (const storeProperty of ownStates)
+		if(ownStates === undefined)
 		{
-			const stateModifierType: Type<IStateModifier<any>> = Reflect.getMetadata(
-				MetadataKeys.stateStateModifier,
-				storeType.prototype,
-				storeProperty);
-	
-			this.initializeStateModifier(storeInstance, stateModifierType, storeProperty);
+			console.warn(`Store ${storeType.name} doesn't contain any state that can be modified`);
+		}
+		else
+		{
+			for (const storeProperty of ownStates)
+			{
+				const stateModifierType: Type<IStateModifier<any>> = Reflect.getMetadata(
+					MetadataKeys.stateStateModifier,
+					storeType.prototype,
+					storeProperty);
+		
+				this.initializeStateModifier(storeInstance, stateModifierType, storeProperty);
+			}
 		}
 	}
 
