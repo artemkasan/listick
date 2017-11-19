@@ -21,7 +21,7 @@ yarn build
 yarn link
 
 Write-Output "Build and pack listick-example"
-Set-Location ../listick-example
+Set-Location ../examples/listick-example
 yarn install
 yarn link "listick"
 yarn link "listick-react"

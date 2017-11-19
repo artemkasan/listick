@@ -21,7 +21,7 @@ Remove-Item dist -Force -Recurse -ErrorAction Ignore
 Remove-Item yarn.lock -Force -ErrorAction Ignore
 
 Write-Output "Clean listick-example"
-Set-Location ../listick-example
+Set-Location ../examples/listick-example
 Remove-Item node_modules -Force -Recurse -ErrorAction Ignore
 Remove-Item dist -Force -Recurse -ErrorAction Ignore
 Remove-Item yarn.lock -Force -ErrorAction Ignore

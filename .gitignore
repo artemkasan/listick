@@ -268,7 +268,7 @@ yarn.lock
 /listick/dist
 /listick-react/dist
 /listick-devtools/dist
-/listick-example/dist
-/listick-example/app.js
-/listick-example/app.js.map
+/examples/listick-example/dist
+/examples/listick-example/app.js
+/examples/listick-example/app.js.map
 /listick/coverage

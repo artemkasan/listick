@@ -24,7 +24,7 @@ cwd=$(pwd)
     rm -rf yarn.lock
 
     echo "Clean listick-example"
-    cd ../listick-example
+    cd ../examples/listick-example
     rm -rf node_modules
     rm -rf dist
     rm -rf yarn.lock

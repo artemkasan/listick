@@ -11,8 +11,8 @@ When I've started to use [Redux]('http://redux.js.org'>) in Typescript, in gener
 All you need is to execute these commands:
 
 ```ps
-build.yarn.ps1
-cd listick-example
+.\build.yarn.ps1
+cd .\examples\listick-example\
 yarn start
 ```
 
