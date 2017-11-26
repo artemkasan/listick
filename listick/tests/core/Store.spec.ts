@@ -1,7 +1,7 @@
 import "mocha";
 
 import { inject, state, store, subscribe, buildStore, Event } from '../../scripts';
-import { assert } from "chai";
+import { assert, expect } from "chai";
 
 describe("Instantiating store", () =>
 {
@@ -68,7 +68,7 @@ describe("Instantiating store", () =>
 		counterService.increment();
 	});
 
-	it("state as simple type", (done) =>
+	it("state as simple type", async () =>
 	{
 		class SimpleStateModifier
 		{
@@ -91,24 +91,20 @@ describe("Instantiating store", () =>
 		}
 
 		const simpleStore = buildStore(SimpleStore);
-		simpleStore.stateChanged.add(() =>
-		{
-			assert.equal(1, simpleStore.getStoreState().count, "store state was not updated");
-			done();
-		});
 		assert.equal(0, simpleStore.getStoreState().count, "initial value for store was not applied");
 		const counterService = simpleStore.getService(CounterService);
-		counterService.increment();
+		await counterService.increment();
+		assert.equal(1, simpleStore.getStoreState().count, "store state was not updated");
 	});
 
-	it("one of state items changed", (done) =>
+	it("one of state items changed", async () =>
 	{
 		interface IComplexState
 		{
 			count: number;
 			name: string;
 		}
-	
+
 		class SimpleStateModifier
 		{
 			initialState:IComplexState = { count: 0, name: "John" }
@@ -132,14 +128,63 @@ describe("Instantiating store", () =>
 		}
 
 		const simpleStore = buildStore(SimpleStore);
-		simpleStore.stateChanged.add(() =>
-		{
-			assert.equal(1, simpleStore.getStoreState().simple.count, "store state was not updated");
-			assert.equal("John", simpleStore.getStoreState().simple.name, "parameter name has changed, but must be old");
-			done();
-		});
 		assert.equal(0, simpleStore.getStoreState().simple.count, "initial value for store was not applied");
+
 		const counterService = simpleStore.getService(CounterService);
-		counterService.increment();
+		await counterService.increment();
+		assert.equal(1, simpleStore.getStoreState().simple.count, "store state was not updated");
+		assert.equal("John", simpleStore.getStoreState().simple.name, "parameter name has changed, but must be old");
+	});
+
+	it("empty store", () =>
+	{
+		@store({
+			eventContainers: [],
+		})
+		class EmptyStore
+		{
+		}
+
+		const emptyStore = buildStore(EmptyStore);
+		const content = emptyStore.getStoreState();
+		assert.deepEqual(content, {});
+	});
+
+	it("initial state", async () =>
+	{
+		class SimpleStateModifier
+		{
+			initialState = 5;
+
+			@subscribe(CounterEvents, se => se.increment)
+			onIncrement(prevState: number, args: number): Partial<number>
+			{
+				return prevState + args;
+			}
+		}
+
+		@store({
+			eventContainers: [CounterEvents],
+		})
+		class SimpleStore
+		{
+			@state(SimpleStateModifier)
+			public state1: number
+
+			public state2: { id: number, data: string }
+		}
+
+		const initialState = { state1: 3, state2: { id: 5, data: "yyy"} };
+
+		const simpleStore = buildStore(SimpleStore, initialState);
+		let content = simpleStore.getStoreState();
+		assert.deepEqual(content, initialState);
+
+		const counterEvents = simpleStore.getEvent(CounterEvents);
+		await counterEvents.increment.fire(counterEvents, 5);
+
+		content = simpleStore.getStoreState();
+		
+		expect(content).to.deep.equal({ state1: 8, state2: { id: 5, data: "yyy"} });
 	});
 });

@@ -262,13 +262,17 @@ __pycache__/
 # Yarn packages
 *.tgz
 
+# Dotnet core
+wwwroot
+
 yarn.lock
 
 /.vscode
+/listick/coverage
 /listick/dist
 /listick-react/dist
 /listick-devtools/dist
-/listick-example/dist
-/listick-example/app.js
-/listick-example/app.js.map
-/listick/coverage
+/examples/listick-example/dist
+/examples/listick-example/app.js
+/examples/listick-example/app.js.map
+/examples/server-rendering/dist

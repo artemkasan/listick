@@ -24,7 +24,15 @@ cwd=$(pwd)
     yarn link
 
     echo "Build and pack listick-example"
-    cd ../listick-example
+    cd ../examples/listick-example
+    yarn install
+    yarn link "listick"
+    yarn link "listick-react"
+    yarn link "listick-devtools"
+    yarn build
+
+    echo "Build and pack server rendering example"
+    cd ../server-rendering
     yarn install
     yarn link "listick"
     yarn link "listick-react"
