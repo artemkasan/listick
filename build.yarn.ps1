@@ -28,4 +28,12 @@ yarn link "listick-react"
 yarn link "listick-devtools"
 yarn build
 
+Write-Output "Build and pack server rendering example"
+Set-Location ../server-rendering
+yarn install
+yarn link "listick"
+yarn link "listick-react"
+yarn link "listick-devtools"
+yarn build
+
 Pop-Location
