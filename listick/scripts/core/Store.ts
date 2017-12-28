@@ -18,14 +18,17 @@ export class Store<T>
 	 */
 	public stateChanged = new Event<{ name: string, newState:T}>();
 
-	private serviceInjector: ServiceProvider;
 	private eventContainers: any[] = [];
+	private serviceProvider: ServiceProvider;
 
 	constructor(
 		private storeInstance: T,
-		storeType: Type<T>)
+		storeType: Type<T>,
+		serviceProvider?: ServiceProvider)
 	{
-		const storeOptions: IStoreOptions = Reflect.getMetadata(MetadataKeys.storeOptions, storeType);
+		const storeOptions: IStoreOptions = Reflect.getMetadata(
+			MetadataKeys.storeOptions,
+			storeType);
 		if (storeOptions === undefined)
 		{
 			throw new Error("You need to apply @store decorator for yor store");
@@ -36,12 +39,24 @@ export class Store<T>
 			this.eventContainers.push(new eventContainerType());
 		}
 
-		this.serviceInjector = new ServiceProvider(this.eventContainers, storeOptions.services);
+		if(serviceProvider !== undefined)
+		{
+			this.serviceProvider = serviceProvider;
+		}
+		else
+		{
+			this.serviceProvider = new ServiceProvider(
+				this.eventContainers,
+				storeOptions.services);
+		}
 
-		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(MetadataKeys.storeOwnStates, storeType.prototype);
+		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(
+			MetadataKeys.storeOwnStates,
+			storeType.prototype);
 		if(ownStates === undefined)
 		{
-			console.warn(`Store ${storeType.name} doesn't contain any state that can be modified`);
+			console.warn(
+				`Store ${storeType.name} doesn't contain any state that can be modified`);
 		}
 		else
 		{
@@ -52,7 +67,10 @@ export class Store<T>
 					storeType.prototype,
 					storeProperty);
 		
-				this.initializeStateModifier(storeInstance, stateModifierType, storeProperty);
+				this.initializeStateModifier(
+					storeInstance,
+					stateModifierType,
+					storeProperty);
 			}
 		}
 	}
@@ -81,8 +99,8 @@ export class Store<T>
 	 */
 	public getService<TService>(serviceType: Type<TService>): TService
 	{
-		const service = this.serviceInjector.getService(serviceType);
-		if (service === undefined)
+		const service = this.serviceProvider.getService(serviceType);
+		if (service === null)
 		{
 			console.error(`Service ${serviceType} is undefined.`);
 			throw new Error(`Service ${serviceType} is undefined.`);

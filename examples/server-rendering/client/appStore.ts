@@ -1,4 +1,4 @@
-import { store, state } from "listick";
+import { store, state, ServiceDescriptor } from "listick";
 
 import { CounterEvents } from "./events/counterEvents";
 import { CounterService } from "./services/counterService";
@@ -6,7 +6,7 @@ import { CounterStateModifier, ICounterState } from "./stateModifiers/counterSta
 
 @store({
 	eventContainers: [CounterEvents],
-	services: [CounterService]
+	services: [ServiceDescriptor.singleton(CounterService)]
 })
 export class AppStore
 {
