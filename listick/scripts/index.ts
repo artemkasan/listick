@@ -9,3 +9,5 @@ export { Store } from "./core/Store";
 export { Type } from "./core/Type";
 export { IStateModifier } from "./core/IStateModifier";
 export { Dispatcher } from "./core/Dispatcher";
+export { ServiceDescriptor } from "./core/ServiceDescriptor";
+export { ServiceProvider } from "./core/ServiceProvider";
