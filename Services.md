@@ -90,10 +90,11 @@ As Singleton service you can instantiate transient service with custom function
 
 ```ts
   ServiceDescriptor.transient(BarService, sp => new BarService(sp.getService(FooService)));
-``
+```
 
 # Example
 Here we will try to combine usage of singleton and transient services types together
+
 ```ts
   @inject class FooService {
     public fooData: number = 5;
@@ -133,7 +134,6 @@ Here we will try to combine usage of singleton and transient services types toge
   class SimpleStore {
     @state(SimpleStateModifier)
     public count: number;
-  }
-  
+  }  
 ```
 First request to CombinedService.complexAction() will return 16 then 17 and etc.
