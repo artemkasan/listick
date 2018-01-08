@@ -1,6 +1,6 @@
 {
   "name": "listick-devtools",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Listick development tools",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
