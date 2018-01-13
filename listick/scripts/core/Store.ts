@@ -34,10 +34,7 @@ export class Store<T>
 			throw new Error("You need to apply @store decorator for yor store");
 		}
 
-		for (const eventContainerType of storeOptions.eventContainers)
-		{
-			this.eventContainers.push(new eventContainerType());
-		}
+		this.initializeEvents(storeOptions.eventContainers);
 
 		if(serviceProvider !== undefined)
 		{
@@ -50,29 +47,7 @@ export class Store<T>
 				storeOptions.services);
 		}
 
-		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(
-			MetadataKeys.storeOwnStates,
-			storeType.prototype);
-		if(ownStates === undefined)
-		{
-			console.warn(
-				`Store ${storeType.name} doesn't contain any state that can be modified`);
-		}
-		else
-		{
-			for (const storeProperty of ownStates)
-			{
-				const stateModifierType: Type<IStateModifier<any>> = Reflect.getMetadata(
-					MetadataKeys.stateStateModifier,
-					storeType.prototype,
-					storeProperty);
-		
-				this.initializeStateModifier(
-					storeInstance,
-					stateModifierType,
-					storeProperty);
-			}
-		}
+		this.initializeOwnState(storeInstance, storeType);
 	}
 
 	/**
@@ -118,7 +93,7 @@ export class Store<T>
 		if(requestedEvent === undefined)
 		{
 			console.error(`Event ${eventType} is undefined.`);
-			throw new Error(`Service ${eventType} is undefined.`);
+			throw new Error(`Event ${eventType} is undefined.`);
 		}
 
 		return requestedEvent;
@@ -144,7 +119,7 @@ export class Store<T>
 			const newState = stateModifierItem(prevState, args) as any
 			if(newState === undefined)
 			{
-				throw new Error(`function ${stateModifierPropertyName} returns undefined state which is not acceptable`);
+				throw new Error(`Function ${stateModifierPropertyName} returns undefined state which is not acceptable`);
 			}
 
 			let newStorePropertyValue: any;
@@ -169,6 +144,49 @@ export class Store<T>
 			this.storeInstance[storeProperty] = newStorePropertyValue;
 			this.onStateChanged(stateModifierPropertyName);
 		});
+	}
+
+	/**
+	 * Processes provided events.
+	 */
+	private initializeEvents(eventContainers: EventContainerType<any>[]): void
+	{
+		for (const eventContainerType of eventContainers)
+		{
+			this.eventContainers.push(new eventContainerType());
+		}
+	}
+
+	/**
+	 * 
+	 * @param storeInstance instance of contained store.
+	 * @param storeType type of contained store.
+	 */
+	private initializeOwnState(storeInstance: T, storeType: Type<T>): void
+	{
+		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(
+			MetadataKeys.storeOwnStates,
+			storeType.prototype);
+		if(ownStates === undefined)
+		{
+			console.warn(
+				`Store ${storeType.name} doesn't contain any state that can be modified`);
+		}
+		else
+		{
+			for (const storeProperty of ownStates)
+			{
+				const stateModifierType: Type<IStateModifier<any>> = Reflect.getMetadata(
+					MetadataKeys.stateStateModifier,
+					storeType.prototype,
+					storeProperty);
+		
+				this.initializeStateModifier(
+					storeInstance,
+					stateModifierType,
+					storeProperty);
+			}
+		}
 	}
 
 	/**
@@ -205,7 +223,7 @@ export class Store<T>
 						stateModifierType.prototype,
 						stateModifierPropertyName) as IGetEventCallbackInfo<any, any>;
 
-				const eventContainerInstance = this.getEventContainerInstance(eventResolver.eventContainer);
+				const eventContainerInstance = this.getEvent(eventResolver.eventContainer);
 				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
 				const stateModifierItem = (stateModifier as any)[stateModifierPropertyName] as (prevState: any, args: any) => any;
 				this.subscribe(storeProperty, eventHandler, stateModifierItem, stateModifierPropertyName);
@@ -229,22 +247,5 @@ export class Store<T>
 	private onStateChanged(reason: string): void
 	{
 		this.stateChanged.fire(this, { name: reason, newState: this.storeInstance });
-	}
-
-	/**
-	 * Searches for event container or throw an exception if event container was no found.
-	 * @param eventContainerType Prototype of event container.
-	 */
-	private getEventContainerInstance<TType>(eventContainerType: EventContainerType<TType>): TType
-	{
-		for (const eventContainer of this.eventContainers)
-		{
-			if (eventContainer instanceof eventContainerType)
-			{
-				return eventContainer;
-			}
-		}
-
-		throw new Error(`Unable to allocate event container with type ${eventContainerType}`);
 	}
 }
