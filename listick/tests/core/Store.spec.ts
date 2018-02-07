@@ -47,7 +47,7 @@ describe("Instantiating store", () =>
 	class MyStore
 	{
 		@state(CounterStateModifier)
-		public counter: ICounterState;
+		public counter: ICounterState = { count: 2 };
 	};
 
 	it("simple initialization", () =>
@@ -87,7 +87,7 @@ describe("Instantiating store", () =>
 		})
 		class SimpleStore {
 			@state(SimpleStateModifier)
-			public count: number;
+			public count: number = 0;
 		}
 
 		const simpleStore = buildStore(SimpleStore);
@@ -124,7 +124,7 @@ describe("Instantiating store", () =>
 		})
 		class SimpleStore {
 			@state(SimpleStateModifier)
-			public simple: IComplexState;
+			public simple: IComplexState = { count: 0, name: "John" };
 		}
 
 		const simpleStore = buildStore(SimpleStore);
@@ -169,9 +169,9 @@ describe("Instantiating store", () =>
 		class SimpleStore
 		{
 			@state(SimpleStateModifier)
-			public state1: number
+			public state1: number = 5;
 
-			public state2: { id: number, data: string }
+			public state2: { id: number, data: string } = { id: 5, data: "yyy"}
 		}
 
 		const initialState = { state1: 3, state2: { id: 5, data: "yyy"} };

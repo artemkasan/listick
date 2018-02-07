@@ -51,7 +51,7 @@ describe("Service provider", () =>
 	it("singleton service with dependent service", () =>
 	{
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[ServiceDescriptor.singleton(SimpleService),
 			ServiceDescriptor.singleton(BarService)]);
 		const barService = serviceProvider.getService(BarService);
@@ -73,7 +73,7 @@ describe("Service provider", () =>
 	it("default singleton with dependent service", () =>
 	{
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[SimpleService, BarService]);
 		const barService = serviceProvider.getService(BarService);
 		if(isNotNull(barService))
@@ -114,7 +114,7 @@ describe("Service provider", () =>
 		const simpleService = new SimpleService();
 		simpleService.simpleValue = 6;
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[ServiceDescriptor.instance(SimpleService, simpleService)]);
 
 		const simpleServiceInstance = serviceProvider.getService(SimpleService);
@@ -146,7 +146,7 @@ describe("Service provider", () =>
 	it("transient service with dependent service", () =>
 	{
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[ServiceDescriptor.transient(SimpleService),
 			ServiceDescriptor.transient(BarService)]);
 		const barService = serviceProvider.getService(BarService);

@@ -1,4 +1,4 @@
-export { inject } from "./decorators/inject";
+export { inject } from "./decorators/InjectDecorator";
 export { state } from "./decorators/StateDecorator";
 export { IStoreOptions} from "./decorators/StoreOptions";
 export { store } from "./decorators/StoreDecorator";
