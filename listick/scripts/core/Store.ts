@@ -6,7 +6,12 @@ import { ServiceProvider } from "./ServiceProvider";
 import { Type } from "./Type";
 import { IStateModifier } from "./IStateModifier";
 
-type StoreState<T> = keyof T;
+export type StoreState<T> = keyof T;
+
+export interface IStateModifierLink<T>{
+	propertName: StoreState<T>;
+	stateModifier: Type<IStateModifier<T>>;
+}
 
 /**
  * Store holds and manage state in listick.
@@ -18,47 +23,16 @@ export class Store<T>
 	 */
 	public stateChanged = new Event<{ name: string, newState:T}>();
 
-	private serviceProvider: ServiceProvider;
-
 	constructor(
 		private storeInstance: T,
-		storeType: Type<T>,
-		serviceProvider?: ServiceProvider) {
-		const storeOptions: IStoreOptions = Reflect.getMetadata(
-			MetadataKeys.storeOptions,
-			storeType);
-		if (storeOptions === undefined) {
-			throw new Error("You need to apply @store decorator for yor store");
-		}
+		stateModifiersLinks: IStateModifierLink<T>[],
+		private serviceProvider: ServiceProvider) {
 
-		if(serviceProvider !== undefined) {
-			this.serviceProvider = serviceProvider;
-		} else {
-			this.serviceProvider = new ServiceProvider(
-				storeOptions.eventContainers,
-				storeOptions.services);
-		}
-
-		const ownStates: Array<StoreState<T>> = Reflect.getMetadata(
-			MetadataKeys.storeOwnStates,
-			storeType.prototype);
-		if(ownStates === undefined) {
-			console.warn(
-				`Store ${storeType.name} doesn't contain any state that can be modified`);
-		} else {
-			for (const storeProperty of ownStates) {
-				const stateModifierType: Type<IStateModifier<any>> =
-					Reflect.getMetadata(
-						MetadataKeys.stateStateModifier,
-						storeType.prototype,
-						storeProperty);
-		
-				this.initializeStateModifier(
-					storeInstance,
-					stateModifierType,
-					storeProperty);
+		for(const stateModifiersLink of stateModifiersLinks) {
+			this.addStateModifier(
+				stateModifiersLink.stateModifier,
+				stateModifiersLink.propertName);
 			}
-		}
 	}
 
 	/**
@@ -110,7 +84,7 @@ export class Store<T>
 
 		console.error(`Event ${eventType} is undefined.`);
 		throw new Error(`Event ${eventType} is undefined.`);
-}
+	}
 
 	/**
 	 * Registers new event type in this store.
@@ -161,18 +135,17 @@ export class Store<T>
 	}
 
 	/**
-	 * Initializes and subscribes state modifier to events.
+	 * Subscribes state modifier to events related to this state.
 	 * @param storeInstance instance of contained store.
 	 * @param stateModifierType Prototype of state modifier.
 	 * @param storeProperty one of the properties of contained store.
 	 */
-	private initializeStateModifier<K extends keyof T>(
-		storeInstance: T,
+	public addStateModifier<K extends keyof T>(
 		stateModifierType: Type<IStateModifier<any>>,
 		storeProperty: K): void {
 		const stateModifier = new stateModifierType();
-		if (storeInstance[storeProperty] === undefined) {
-			storeInstance[storeProperty] = stateModifier.initialState;
+		if (this.storeInstance[storeProperty] === undefined) {
+			this.storeInstance[storeProperty] = stateModifier.initialState;
 		}
 
 		const subscribedListeners: string[] = Reflect.getMetadata(

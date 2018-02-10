@@ -32,6 +32,6 @@
     "karma-typescript": "^3.0.8",
     "karma-typescript-es6-transform": "^1.0.2",
     "mocha": "^4.0.1",
-    "typescript": "^2.6.1"
+    "typescript": "^2.7.1"
   }
 }
