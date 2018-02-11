@@ -95,6 +95,41 @@ export class Store<T>
 	}
 
 	/**
+	 * Subscribes state modifier to events related to this state.
+	 * @param storeInstance instance of contained store.
+	 * @param stateModifierType Prototype of state modifier.
+	 * @param storeProperty one of the properties of contained store.
+	 */
+	public addStateModifier<K extends keyof T>(
+		stateModifierType: Type<IStateModifier<any>>,
+		storeProperty: K): void {
+		const stateModifier = new stateModifierType();
+		if (this.storeInstance[storeProperty] === undefined) {
+			this.storeInstance[storeProperty] = stateModifier.initialState;
+		}
+
+		const subscribedListeners: string[] = Reflect.getMetadata(
+			MetadataKeys.subscribedListeners,
+			stateModifierType.prototype) as string[];
+
+		if(subscribedListeners === undefined) {
+			console.warn(`No subscriptions are defined for ${stateModifierType.name}`)
+		} else {
+			for (const stateModifierPropertyName of subscribedListeners) {
+				const eventResolver = Reflect.getMetadata(
+						MetadataKeys.eventResolver,
+						stateModifierType.prototype,
+						stateModifierPropertyName) as IGetEventCallbackInfo<any, any>;
+
+				const eventContainerInstance = this.getEvent(eventResolver.eventContainer);
+				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
+				const stateModifierItem = (stateModifier as any)[stateModifierPropertyName] as (prevState: any, args: any) => any;
+				this.subscribe(storeProperty, eventHandler, stateModifierItem, stateModifierPropertyName);
+			}
+		}
+	}
+
+	/**
 	 * Binds event handler with a method of state modifier for modifications.
 	 * @param storeProperty one of store properties.
 	 * @param eventHandler event handler that must be subscribed.
@@ -132,41 +167,6 @@ export class Store<T>
 			this.storeInstance[storeProperty] = newStorePropertyValue;
 			this.onStateChanged(stateModifierPropertyName);
 		});
-	}
-
-	/**
-	 * Subscribes state modifier to events related to this state.
-	 * @param storeInstance instance of contained store.
-	 * @param stateModifierType Prototype of state modifier.
-	 * @param storeProperty one of the properties of contained store.
-	 */
-	public addStateModifier<K extends keyof T>(
-		stateModifierType: Type<IStateModifier<any>>,
-		storeProperty: K): void {
-		const stateModifier = new stateModifierType();
-		if (this.storeInstance[storeProperty] === undefined) {
-			this.storeInstance[storeProperty] = stateModifier.initialState;
-		}
-
-		const subscribedListeners: string[] = Reflect.getMetadata(
-			MetadataKeys.subscribedListeners,
-			stateModifierType.prototype) as string[];
-
-		if(subscribedListeners === undefined) {
-			console.warn(`No subscriptions are defined for ${stateModifierType.name}`)
-		} else {
-			for (const stateModifierPropertyName of subscribedListeners) {
-				const eventResolver = Reflect.getMetadata(
-						MetadataKeys.eventResolver,
-						stateModifierType.prototype,
-						stateModifierPropertyName) as IGetEventCallbackInfo<any, any>;
-
-				const eventContainerInstance = this.getEvent(eventResolver.eventContainer);
-				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
-				const stateModifierItem = (stateModifier as any)[stateModifierPropertyName] as (prevState: any, args: any) => any;
-				this.subscribe(storeProperty, eventHandler, stateModifierItem, stateModifierPropertyName);
-			}
-		}
 	}
 
 	/**

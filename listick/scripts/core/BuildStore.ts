@@ -1,7 +1,8 @@
+import * as MetadataKeys from "./MetadataKeys";
+
 import { Store, StoreState, IStateModifierLink } from "./Store";
 import { Type } from "./Type";
 import { IStoreOptions } from "../decorators/StoreOptions";
-import * as MetadataKeys from "./MetadataKeys";
 import { ServiceProvider } from "./ServiceProvider";
 import { IStateModifier } from "..";
 
