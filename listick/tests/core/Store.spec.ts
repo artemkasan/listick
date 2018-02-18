@@ -1,6 +1,6 @@
 import "mocha";
 
-import { inject, state, store, subscribe, buildStore, Event } from '../../scripts';
+import { inject, state, store, subscribe, buildStore, Event, extendStore } from '../../scripts';
 import { assert, expect } from "chai";
 
 describe("Instantiating store", () =>
@@ -186,5 +186,373 @@ describe("Instantiating store", () =>
 		content = simpleStore.getStoreState();
 		
 		expect(content).to.deep.equal({ state1: 8, state2: { id: 5, data: "yyy"} });
+	});
+
+	it("extendStore", async () => {
+		class OriginalEvents {
+			public origEvent = new Event<{ a: number }>();
+		}
+
+		@inject class OriginalService {
+			constructor(private originalEvents: OriginalEvents ) { }
+
+			public fireEvent(): Promise<void> {
+				return this.originalEvents.origEvent.fire(this, {a: 5 })
+			}
+		}
+
+		interface IOriginalState { a: number }
+
+		class OriginalStateModifier {
+			initialState: IOriginalState = { a: 2 };
+
+			@subscribe(OriginalEvents, ec => ec.origEvent)
+			public onOriginal(prevState:IOriginalState, args: { a: number})
+				: Partial<IOriginalState> {
+				return {
+					a: prevState.a + args.a
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [OriginalEvents],
+			services: [OriginalService]
+		})
+		class OriginalStore {
+			@state(OriginalStateModifier)
+			public originalState = { a: 2 };
+		};
+	
+		class ExtendedEvents {
+			public exEvent = new Event<{ b: number }>();
+		}
+
+		@inject class ExtendedService {
+			constructor(private extendedEvents: ExtendedEvents ) { }
+
+			public fireEvent(): Promise<void> {
+				return this.extendedEvents.exEvent.fire(this, {b: 5 })
+			}
+		}
+
+		interface IExtendedState { b: number }
+
+		class ExtendedStateModifier {
+			initialState: IExtendedState = { b: 2 };
+			
+			@subscribe(ExtendedEvents,ec => ec.exEvent)
+			public onIncrement(prevState:IExtendedState, args: { b: number})
+				: Partial<IExtendedState> {
+				return {
+					b: prevState.b + args.b
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [ExtendedEvents],
+			services: [ExtendedService]
+		})
+		class ExtendStore {
+			@state(ExtendedStateModifier)
+			public extendedState: IExtendedState = { b: 3 };
+		};
+
+		const originalStore = buildStore(OriginalStore)
+		const joinedStore = extendStore(originalStore, ExtendStore);
+
+		const storeState = joinedStore.getStoreState();
+		assert.equal(2, storeState.originalState.a);
+		assert.equal(3, storeState.extendedState.b);
+		const originalService = joinedStore.getService(OriginalService);
+		await originalService.fireEvent();
+		const originalModifiedState = joinedStore.getStoreState();
+		assert.equal(7, originalModifiedState.originalState.a);
+		assert.equal(3, originalModifiedState.extendedState.b);
+		const extendedService = joinedStore.getService(ExtendedService);
+		await extendedService.fireEvent();
+		const extendedModifierState = joinedStore.getStoreState();
+		assert.equal(7, extendedModifierState.originalState.a);
+		assert.equal(8, extendedModifierState.extendedState.b);
+	});
+
+	it("extendStore services intersection", async () => {
+		@inject class CommonService {
+			public getValue(): number {
+				return 5;
+			}
+		}
+
+		class OriginalEvents {
+			public origEvent = new Event<{ a: number }>();
+		}
+
+		@inject class OriginalService {
+			constructor(private originalEvents: OriginalEvents,
+				private commonService: CommonService ) { }
+
+			public fireEvent(): Promise<void> {
+				const val = this.commonService.getValue();
+				return this.originalEvents.origEvent.fire(this, {a: val });
+			}
+		}
+
+		interface IOriginalState { a: number }
+
+		class OriginalStateModifier {
+			initialState: IOriginalState = { a: 2 };
+
+			@subscribe(OriginalEvents,ec => ec.origEvent)
+			public onOriginal(prevState:IOriginalState, args: { a: number})
+				: Partial<IOriginalState> {
+				return {
+					a: prevState.a + args.a
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [OriginalEvents],
+			services: [CommonService, OriginalService]
+		})
+		class OriginalStore {
+			@state(OriginalStateModifier)
+			public originalState = { a: 2 };
+		};
+	
+		class ExtendedEvents {
+			public exEvent = new Event<{ b: number }>();
+		}
+
+		@inject class ExtendedService {
+			constructor(private extendedEvents: ExtendedEvents,
+				private commonService: CommonService ) { }
+
+			public fireEvent(): Promise<void> {
+				const val = this.commonService.getValue();
+				return this.extendedEvents.exEvent.fire(this, {b: val })
+			}
+		}
+
+		interface IExtendedState { b: number }
+
+		class ExtendedStateModifier {
+			initialState: IExtendedState = { b: 2 };
+			
+			@subscribe(ExtendedEvents,ec => ec.exEvent)
+			public onIncrement(prevState:IExtendedState, args: { b: number})
+				: Partial<IExtendedState> {
+				return {
+					b: prevState.b + args.b
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [ExtendedEvents],
+			services: [CommonService, ExtendedService]
+		})
+		class ExtendStore {
+			@state(ExtendedStateModifier)
+			public extendedState: IExtendedState = { b: 3 };
+		};
+
+		const originalStore = buildStore(OriginalStore)
+		const joinedStore = extendStore(originalStore, ExtendStore);
+
+		const storeState = joinedStore.getStoreState();
+		assert.equal(2, storeState.originalState.a);
+		assert.equal(3, storeState.extendedState.b);
+		const originalService = joinedStore.getService(OriginalService);
+		await originalService.fireEvent();
+		const originalModifiedState = joinedStore.getStoreState();
+		assert.equal(7, originalModifiedState.originalState.a);
+		assert.equal(3, originalModifiedState.extendedState.b);
+		const extendedService = joinedStore.getService(ExtendedService);
+		await extendedService.fireEvent();
+		const extendedModifierState = joinedStore.getStoreState();
+		assert.equal(7, extendedModifierState.originalState.a);
+		assert.equal(8, extendedModifierState.extendedState.b);
+	});
+
+	it("extendStore common event", async () => {
+		class CommonEvents {
+			public commonEvent = new Event<{ a: number }>();
+		}
+
+		@inject class OriginalService {
+			constructor(private commonEvents: CommonEvents ) { }
+
+			public fireEvent(): Promise<void> {
+				return this.commonEvents.commonEvent.fire(this, {a: 5 })
+			}
+		}
+
+		interface IOriginalState { a: number }
+
+		class OriginalStateModifier {
+			initialState: IOriginalState = { a: 2 };
+
+			@subscribe(CommonEvents,ec => ec.commonEvent)
+			public onOriginal(prevState:IOriginalState, args: { a: number})
+				: Partial<IOriginalState> {
+				return {
+					a: prevState.a + args.a
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [CommonEvents],
+			services: [OriginalService]
+		})
+		class OriginalStore {
+			@state(OriginalStateModifier)
+			public originalState = { a: 2 };
+		};
+	
+		@inject class ExtendedService {
+			constructor(private commonEvents: CommonEvents ) { }
+
+			public fireEvent(): Promise<void> {
+				return this.commonEvents.commonEvent.fire(this, {a: 5 })
+			}
+		}
+
+		interface IExtendedState { b: number }
+
+		class ExtendedStateModifier {
+			initialState: IExtendedState = { b: 2 };
+			
+			@subscribe(CommonEvents,ec => ec.commonEvent)
+			public onIncrement(prevState:IExtendedState, args: { a: number})
+				: Partial<IExtendedState> {
+				return {
+					b: prevState.b + args.a
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [CommonEvents],
+			services: [ExtendedService]
+		})
+		class ExtendStore {
+			@state(ExtendedStateModifier)
+			public extendedState: IExtendedState = { b: 3 };
+		};
+
+		const originalStore = buildStore(OriginalStore)
+		const joinedStore = extendStore(originalStore, ExtendStore);
+
+		const storeState = joinedStore.getStoreState();
+		assert.equal(2, storeState.originalState.a);
+		assert.equal(3, storeState.extendedState.b);
+		const originalService = joinedStore.getService(OriginalService);
+		await originalService.fireEvent();
+		const originalModifiedState = joinedStore.getStoreState();
+		assert.equal(7, originalModifiedState.originalState.a);
+		assert.equal(8, originalModifiedState.extendedState.b);
+		const extendedService = joinedStore.getService(ExtendedService);
+		await extendedService.fireEvent();
+		const extendedModifierState = joinedStore.getStoreState();
+		assert.equal(12, extendedModifierState.originalState.a);
+		assert.equal(13, extendedModifierState.extendedState.b);
+	});
+
+	it("extendStore state intersection", async () => {
+		class OriginalEvents {
+			public origEvent = new Event<{ a: number }>();
+		}
+
+		@inject class OriginalService {
+			constructor(private originalEvents: OriginalEvents ) { }
+
+			public fireEvent(): Promise<void> {
+				return this.originalEvents.origEvent.fire(this, {a: 5 })
+			}
+		}
+
+		interface IOriginalState { a: number }
+
+		class OriginalStateModifier {
+			initialState: IOriginalState = { a: 2 };
+
+			@subscribe(OriginalEvents,ec => ec.origEvent)
+			public onOriginal(prevState:IOriginalState, args: { a: number}): Partial<IOriginalState>
+			{
+				return {
+					a: prevState.a + args.a
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [OriginalEvents],
+			services: [OriginalService]
+		})
+		class OriginalStore {
+			@state(OriginalStateModifier)
+			public originalState: IOriginalState = { a: 2 };
+		};
+	
+		class ExtendedEvents {
+			public exEvent = new Event<{ b: number }>();
+		}
+
+		@inject class ExtendedService {
+			constructor(private extendedEvents: ExtendedEvents ) { }
+
+			public fireEvent(): Promise<void> {
+				return this.extendedEvents.exEvent.fire(this, {b: 5 })
+			}
+		}
+
+		interface IExtendedState { b: number }
+
+		class ExtendedStateModifier {
+			initialState: IExtendedState = { b: 2 };
+			
+			@subscribe(ExtendedEvents,ec => ec.exEvent)
+			public onIncrement(prevState:IExtendedState, args: { b: number})
+				: Partial<IExtendedState> {
+				return {
+					b: prevState.b + args.b
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [ExtendedEvents],
+			services: [ExtendedService]
+		})
+		class ExtendStore {
+			@state(ExtendedStateModifier)
+			public extendedState: IExtendedState = { b: 3 };
+
+			@state(ExtendedStateModifier)
+			public originalState: IExtendedState = { b: 2 };
+		};
+
+		const originalStore = buildStore(OriginalStore)
+		const joinedStore = extendStore(originalStore, ExtendStore);
+
+		const storeState = joinedStore.getStoreState();
+		assert.isUndefined(storeState.originalState.a)
+		assert.equal(2, storeState.originalState.b);
+		assert.equal(3, storeState.extendedState.b);
+		const originalService = joinedStore.getService(OriginalService);
+		await originalService.fireEvent();
+		const originalModifiedState = joinedStore.getStoreState();
+		assert.isNaN(originalModifiedState.originalState.a);
+		assert.equal(2, originalModifiedState.originalState.b);
+		assert.equal(3, originalModifiedState.extendedState.b);
+		const extendedService = joinedStore.getService(ExtendedService);
+		await extendedService.fireEvent();
+		const extendedModifierState = joinedStore.getStoreState();
+		assert.isNaN(originalModifiedState.originalState.a);
+		assert.equal(7, extendedModifierState.originalState.b);
+		assert.equal(8, extendedModifierState.extendedState.b);
 	});
 });

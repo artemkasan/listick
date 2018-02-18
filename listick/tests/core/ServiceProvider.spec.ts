@@ -182,10 +182,26 @@ describe("Service provider", () =>
 			assert.equal(simpleService.simpleValue, 5);
 		}
 	});
+
+	it("service without constructor", () => {
+		@inject class EmptyConstructorService
+		{
+			public get_foo(): number { return 5; }
+
+		}
+	
+		const serviceProvider = new ServiceProvider(
+			[],
+			[EmptyConstructorService]);
+		const simpleService1 = serviceProvider.getService(EmptyConstructorService);
+
+		if(isNotNull(simpleService1)) {
+			assert.equal(5, simpleService1.get_foo());
+		}
+	})
 });
 
-function isNotNull<T>(value: T | null ): value is T
-{
+function isNotNull<T>(value: T | null ): value is T {
 	assert.isNotNull(value);
 	return true;
 }

@@ -14,9 +14,27 @@ export class ServiceProvider {
 	private _services: ServiceDescriptor[] = [];
 	private _events:IEventDescriptor<any>[] = [];
 
+	private _parentServiceProvider: ServiceProvider | null = null;
+
+	constructor(
+		parentServiceProvider: ServiceProvider,
+		events?: Type<any>[],
+		services?: Array<ServiceType>);
 	constructor(
 		events: Type<any>[],
-		services: Array<ServiceType> | undefined) {
+		services?: Array<ServiceType>);
+	constructor(
+		parentServiceProvider: any,
+		events: any,
+		services?: any) {
+
+		if(parentServiceProvider instanceof ServiceProvider) {
+			this._parentServiceProvider = events;
+		} else {
+			services = events;
+			events = parentServiceProvider;
+		}
+
 		if(events !== undefined) {
 			for(const eventType of events) {
 				this.registerEvent(eventType);
@@ -45,6 +63,10 @@ export class ServiceProvider {
 			}
 		}
 
+		if(this._parentServiceProvider !== null) {
+			return this._parentServiceProvider.getEvent(eventType);
+		}
+
 		return null;
 	}
 
@@ -67,6 +89,10 @@ export class ServiceProvider {
 
 				return this.getOrInitService(serviceInfo);
 			}
+		}
+
+		if(this._parentServiceProvider !== null) {
+			return this._parentServiceProvider.getService(type);
 		}
 
 		return null;
@@ -116,16 +142,18 @@ export class ServiceProvider {
 
 		const inputArgs: Type<any>[] = Reflect.getMetadata("design:paramtypes", serviceDescriptor.type)
 		const serviceArgs: any[] = [];
-		for (const inputArg of inputArgs) {
-			const requestedEventContainer = this.getEvent(inputArg);
-			if (requestedEventContainer !== null) {
-				serviceArgs.push(requestedEventContainer);
-			} else {
-				const serviceArg = this.getService(inputArg);
-				if (serviceArg == null) {
-					console.log(`You must define @inject for service ${inputArg}`);
+		if(inputArgs !== undefined) {
+			for (const inputArg of inputArgs) {
+				const requestedEventContainer = this.getEvent(inputArg);
+				if (requestedEventContainer !== null) {
+					serviceArgs.push(requestedEventContainer);
+				} else {
+					const serviceArg = this.getService(inputArg);
+					if (serviceArg == null) {
+						console.log(`You must define @inject for service ${inputArg}`);
+					}
+					serviceArgs.push(serviceArg);
 				}
-				serviceArgs.push(serviceArg);
 			}
 		}
 

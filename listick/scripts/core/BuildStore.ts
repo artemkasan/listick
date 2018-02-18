@@ -4,7 +4,7 @@ import { Store, StoreState, IStateModifierLink } from "./Store";
 import { Type } from "./Type";
 import { IStoreOptions } from "../decorators/StoreOptions";
 import { ServiceProvider } from "./ServiceProvider";
-import { IStateModifier } from "..";
+import { IStateModifier } from "./IStateModifier";
 
 /**
  * Builds new store that is the root object for listick.

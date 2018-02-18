@@ -5,6 +5,7 @@ import * as MetadataKeys from "./MetadataKeys";
 import { ServiceProvider } from "./ServiceProvider";
 import { Type } from "./Type";
 import { IStateModifier } from "./IStateModifier";
+import { ServiceDescriptor } from "./ServiceDescriptor";
 
 export type StoreState<T> = keyof T;
 
@@ -68,7 +69,7 @@ export class Store<T>
 	 * Registers new service in current store.
 	 * @param serviceType service type to register.
 	 */
-	public registerService<TService>(serviceType: Type<TService>): TService | null {
+	public registerService<TService>(serviceType: Type<TService> | ServiceDescriptor): TService | null {
 		return this.serviceProvider.registerService(serviceType);
 	}
 
