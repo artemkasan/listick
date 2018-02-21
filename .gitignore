@@ -270,6 +270,8 @@ yarn.lock
 /.vscode
 /listick/coverage
 /listick/dist
+/listick-router/dist
+/listick-router/coverage
 /listick-react/dist
 /listick-devtools/dist
 /examples/listick-example/dist

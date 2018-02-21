@@ -199,6 +199,33 @@ describe("Service provider", () =>
 			assert.equal(5, simpleService1.get_foo());
 		}
 	})
+
+	it("register service instance", () => {
+		@inject class EmptyConstructorService
+		{
+			public get_foo(): number { return 5; }
+
+		}
+
+		class CustomService {
+			constructor(
+				private customInput: number) {
+			}
+
+			public getCustomInput(): number {
+				return this.customInput;
+			}
+		}
+	
+		const serviceProvider = new ServiceProvider(
+			[],
+			[EmptyConstructorService]);
+		
+		const customService = new CustomService(5);
+		const registeredService = serviceProvider.registerService(
+				ServiceDescriptor.instance(CustomService, customService));
+		assert.equal(customService, registeredService);
+	})
 });
 
 function isNotNull<T>(value: T | null ): value is T {

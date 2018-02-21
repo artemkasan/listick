@@ -81,12 +81,6 @@ export class ServiceProvider {
 
 		for (const serviceInfo of this._services) {
 			if(serviceInfo.type == type) {
-				if(serviceInfo.lifetime === 'singleton') {
-					if(serviceInfo.implementationInstance !== undefined) {
-						return serviceInfo.implementationInstance;
-					}
-				}
-
 				return this.getOrInitService(serviceInfo);
 			}
 		}
@@ -126,6 +120,16 @@ export class ServiceProvider {
 	}
 
 	private getOrInitService<T>(serviceDescriptor: ServiceDescriptor): T | null {
+		for (const serviceInfo of this._services) {
+			if(serviceInfo.type == serviceDescriptor.type) {
+				if(serviceInfo.lifetime === 'singleton') {
+					if(serviceInfo.implementationInstance !== undefined) {
+						return serviceInfo.implementationInstance;
+					}
+				}
+			}
+		}
+
 		if(serviceDescriptor.initFunction !== undefined) {
 			const objectInstance = serviceDescriptor.initFunction(this) as T;
 			if(serviceDescriptor.lifetime == "singleton") {

@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"target": "es5",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"sourceMap": true,
+		"skipDefaultLibCheck": true,
+		"strict": true,
+		"lib": ["es6", "dom"],
+		"declaration": true,
+		"typeRoots": [
+			"../node_modules/@types"
+		]
+	}
+}
