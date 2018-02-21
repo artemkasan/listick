@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "skipDefaultLibCheck": true,
+    "strict": true,
+    "jsx": "react",
+    "lib": ["es6", "dom"],
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+      "node_modules"
+  ]
+}

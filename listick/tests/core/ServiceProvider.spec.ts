@@ -51,7 +51,7 @@ describe("Service provider", () =>
 	it("singleton service with dependent service", () =>
 	{
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[ServiceDescriptor.singleton(SimpleService),
 			ServiceDescriptor.singleton(BarService)]);
 		const barService = serviceProvider.getService(BarService);
@@ -73,7 +73,7 @@ describe("Service provider", () =>
 	it("default singleton with dependent service", () =>
 	{
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[SimpleService, BarService]);
 		const barService = serviceProvider.getService(BarService);
 		if(isNotNull(barService))
@@ -114,7 +114,7 @@ describe("Service provider", () =>
 		const simpleService = new SimpleService();
 		simpleService.simpleValue = 6;
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[ServiceDescriptor.instance(SimpleService, simpleService)]);
 
 		const simpleServiceInstance = serviceProvider.getService(SimpleService);
@@ -146,7 +146,7 @@ describe("Service provider", () =>
 	it("transient service with dependent service", () =>
 	{
 		const serviceProvider = new ServiceProvider(
-			[new FooEvent()],
+			[FooEvent],
 			[ServiceDescriptor.transient(SimpleService),
 			ServiceDescriptor.transient(BarService)]);
 		const barService = serviceProvider.getService(BarService);
@@ -182,10 +182,53 @@ describe("Service provider", () =>
 			assert.equal(simpleService.simpleValue, 5);
 		}
 	});
+
+	it("service without constructor", () => {
+		@inject class EmptyConstructorService
+		{
+			public get_foo(): number { return 5; }
+
+		}
+	
+		const serviceProvider = new ServiceProvider(
+			[],
+			[EmptyConstructorService]);
+		const simpleService1 = serviceProvider.getService(EmptyConstructorService);
+
+		if(isNotNull(simpleService1)) {
+			assert.equal(5, simpleService1.get_foo());
+		}
+	})
+
+	it("register service instance", () => {
+		@inject class EmptyConstructorService
+		{
+			public get_foo(): number { return 5; }
+
+		}
+
+		class CustomService {
+			constructor(
+				private customInput: number) {
+			}
+
+			public getCustomInput(): number {
+				return this.customInput;
+			}
+		}
+	
+		const serviceProvider = new ServiceProvider(
+			[],
+			[EmptyConstructorService]);
+		
+		const customService = new CustomService(5);
+		const registeredService = serviceProvider.registerService(
+				ServiceDescriptor.instance(CustomService, customService));
+		assert.equal(customService, registeredService);
+	})
 });
 
-function isNotNull<T>(value: T | null ): value is T
-{
+function isNotNull<T>(value: T | null ): value is T {
 	assert.isNotNull(value);
 	return true;
 }

@@ -1,0 +1,7 @@
+tests/
+coverage/
+scripts/
+node_modules/
+tsconfig.json
+karma.conf.js
+*.tgz
