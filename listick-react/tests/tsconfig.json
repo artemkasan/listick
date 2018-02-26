@@ -10,13 +10,6 @@
 		"strict": true,
 		"jsx": "react",
 		"lib": ["es6", "dom"],
-		"declaration": true,
-		"outDir": "dist"
-	},
-	"include": [
-		"scripts/**/*.ts"
-	],
-	"exclude": [
-		"node_modules"
-	]
+		"declaration": true
+	}
 }

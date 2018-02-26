@@ -6,5 +6,5 @@ export interface IStateModifier<TState>
 	/**
 	 * Initial state.
 	 */
-	initialState: TState;
+	initialState?: TState;
 }
