@@ -273,6 +273,7 @@ yarn.lock
 /listick-router/dist
 /listick-router/coverage
 /listick-react/dist
+/listick-react/coverage
 /listick-devtools/dist
 /examples/listick-example/dist
 /examples/listick-example/app.js
