@@ -1,6 +1,6 @@
 {
   "name": "listick",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "Laconic state container for TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

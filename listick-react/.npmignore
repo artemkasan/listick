@@ -1,4 +1,7 @@
 scripts/
+tests/
 node_modules/
 coverage/
 tsconfig.json
+karma.conf.js
+*.tgz

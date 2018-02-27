@@ -1,6 +1,6 @@
 {
   "name": "listick-devtools",
-  "version": "0.1.3",
+  "version": "0.2.1",
   "description": "Listick development tools",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,9 +16,9 @@
     "development"
   ],
   "dependencies": {
-    "listick": "0.1.1"
+    "listick": "^0.2.1"
   },
   "devDependencies": {
-    "typescript": "^2.6.1"
+    "typescript": "^2.7.2"
   }
 }
