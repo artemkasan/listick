@@ -42,6 +42,8 @@ export class CounterEvents
 
 Here we see that events container contains two events, and each of them has argument number.
 
+Istead of integrated events you can use rxJs for this you need to declare Observable properties and then subscribe **StateModifier** to its events.
+
 ## State modifiers
 
 State modifier are classes that do state mutation.
@@ -76,6 +78,8 @@ export class CounterStateModifier implements IStateModifier<ICounterState>
 
 Inside state modifier we have to define initial state for state modifier. Implementation of ```IStateModifier<TState>``` is optional because of duck typing.
 Each method of state modifier that must listen for events and mutate state must be marked by **@subscribe** decorator. It defines which event must be listened. Method itself returns mutated part of state. If state is simple type, this simple type can be returned.
+
+Also it is possible to subscribe to rxjs observables for this you need to use **import { subscribe } from 'rx/SubscribeDecorator'** istead of standard import. Another syntax is the same.
 
 ## Store
 
