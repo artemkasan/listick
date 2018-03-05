@@ -58,7 +58,7 @@ Future work of this state is unpredictable.`);
 							stateType.prototype,
 							storeProperty);
 				stateModifiersLinks.push({
-					propertName: storeProperty,
+					propertyName: storeProperty,
 					stateModifier: stateModifierType
 				});
 			}
@@ -67,7 +67,7 @@ Future work of this state is unpredictable.`);
 		for(const stateModifiersLink of stateModifiersLinks) {
 			originalStore.addStateModifier(
 				stateModifiersLink.stateModifier,
-				stateModifiersLink.propertName);
+				stateModifiersLink.propertyName);
 		}
 
 		const result: Store<T&U> = originalStore as any as Store<T&U>;

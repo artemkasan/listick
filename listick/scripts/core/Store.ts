@@ -10,8 +10,8 @@ import { ServiceDescriptor } from "./ServiceDescriptor";
 export type StoreState<T> = keyof T;
 
 export interface IStateModifierLink<T>{
-	propertName: StoreState<T>;
-	stateModifier: Type<IStateModifier<T>>;
+	propertyName: StoreState<T>;
+	stateModifier: Type<IStateModifier<T[StoreState<T>]>>;
 }
 
 /**
@@ -32,7 +32,7 @@ export class Store<T>
 		for(const stateModifiersLink of stateModifiersLinks) {
 			this.addStateModifier(
 				stateModifiersLink.stateModifier,
-				stateModifiersLink.propertName);
+				stateModifiersLink.propertyName);
 			}
 	}
 
@@ -101,17 +101,20 @@ export class Store<T>
 	 * @param stateModifierType Prototype of state modifier.
 	 * @param storeProperty one of the properties of contained store.
 	 */
-	public addStateModifier<K extends keyof T>(
-		stateModifierType: Type<IStateModifier<any>>,
+	public addStateModifier<K extends keyof T, TStateModifier extends IStateModifier<T[K]>>(
+		stateModifierType: Type<TStateModifier>,
 		storeProperty: K): void {
+
+		type StateModifierProperty = keyof TStateModifier;
 		const stateModifier = new stateModifierType();
-		if (this.storeInstance[storeProperty] === undefined) {
+		if (this.storeInstance[storeProperty] === undefined &&
+			stateModifier.initialState !== undefined) {
 			this.storeInstance[storeProperty] = stateModifier.initialState;
 		}
 
-		const subscribedListeners: string[] = Reflect.getMetadata(
+		const subscribedListeners = Reflect.getMetadata(
 			MetadataKeys.subscribedListeners,
-			stateModifierType.prototype) as string[];
+			stateModifierType.prototype) as StateModifierProperty[];
 
 		if(subscribedListeners === undefined) {
 			console.warn(`No subscriptions are defined for ${stateModifierType.name}`)
@@ -124,26 +127,27 @@ export class Store<T>
 
 				const eventContainerInstance = this.getEvent(eventResolver.eventContainer);
 				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
-				const stateModifierItem = (stateModifier as any)[stateModifierPropertyName] as (prevState: any, args: any) => any;
-				this.subscribe(storeProperty, eventHandler, stateModifierItem, stateModifierPropertyName);
+				const stateModifierItem = 
+					stateModifier[stateModifierPropertyName] as any as (prevState: T[K], args: any) => Partial<T[K]>;
+				eventHandler(
+					this.subscribe(storeProperty, stateModifierItem, stateModifierPropertyName));
 			}
 		}
 	}
 
 	/**
-	 * Binds event handler with a method of state modifier for modifications.
+	 * Initializes subscription to state modification.
 	 * @param storeProperty one of store properties.
-	 * @param eventHandler event handler that must be subscribed.
 	 * @param stateModifierItem state modifier method that must be subscribed.
 	 * @param stateModifierPropertyName state modifier method name, used for 
 	 * in reason why state has changed.
+	 * @returns callback that must be fired for state modification
 	 */
-	private subscribe<K extends keyof T, TArgs>(
+	public subscribe<K extends keyof T, TArgs>(
 		storeProperty:K,
-		eventHandler: Event<TArgs>,
-		stateModifierItem: (prevState:T[K], args: TArgs) => T[K],
-		stateModifierPropertyName: string) {
-		eventHandler.add((sender, args) => {
+		stateModifierItem: (prevState:T[K], args: TArgs) => Partial<T[K]>,
+		stateModifierPropertyName: string): (args: TArgs) => void {
+		return (args: TArgs) => {
 			const prevState = this.storeInstance[storeProperty] as any;
 			const newState = stateModifierItem(prevState, args) as any
 			if(newState === undefined) {
@@ -167,7 +171,7 @@ export class Store<T>
 
 			this.storeInstance[storeProperty] = newStorePropertyValue;
 			this.onStateChanged(stateModifierPropertyName);
-		});
+		};
 	}
 
 	/**
