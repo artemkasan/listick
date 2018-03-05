@@ -1,10 +1,12 @@
 ﻿import { Event } from "../core/Event";
 import { Type } from "./Type";
+import { Subscriber } from "rxjs/Subscriber";
 
-export type GetEventCallback<TEvent, TArgs> = (eventsContainer: TEvent) => Event<TArgs>;
+export type SubscribtionCallback<TEvent, TArgs> =
+	(eventsContainer: TEvent) => (actionCallback: (args: TArgs) => void) => void;
 
-export interface IGetEventCallbackInfo<T, TArgs>
+export interface IGetEventCallbackInfo<TEvent, TArgs>
 {
-	eventContainer: Type<T>;
-	getEventCallback: GetEventCallback<T, TArgs>;
+	eventContainer: Type<TEvent>;
+	getEventCallback: SubscribtionCallback<TEvent, TArgs>;
 }

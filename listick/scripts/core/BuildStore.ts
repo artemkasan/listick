@@ -41,7 +41,7 @@ export function buildStore<T>(storeType: Type<T>, initialState?: T): Store<T>
 						storeType.prototype,
 						storeProperty);
 			stateModifiersLinks.push({
-				propertName: storeProperty,
+				propertyName: storeProperty,
 				stateModifier: stateModifierType
 			});
 		}
