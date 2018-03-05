@@ -5,7 +5,6 @@ import { subscribe as rxSubscribe } from '../../scripts/RxSubscription';
 import { assert, expect } from "chai";
 import { Observable } from 'rxjs/Observable';
 import { ArrayObservable } from 'rxjs/observable/ArrayObservable';
-import { Subscriber } from "rxjs/Subscriber";
 import { Observer } from "rxjs/Observer";
 
 describe("StateModifier using RxJs", () =>
