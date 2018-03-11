@@ -3,32 +3,26 @@ import "mocha";
 import { inject, state, store, subscribe, buildStore, Event, extendStore } from '../../scripts';
 import { assert, expect } from "chai";
 
-describe("Instantiating store", () =>
-{
-	class CounterEvents
-	{
+describe("Instantiating store", () => {
+	class CounterEvents {
 		public increment = new Event<number>();
 		public decrement = new Event<number>();
 	}
 
-	@inject class CounterService
-	{
+	@inject class CounterService {
 		constructor(
 			private counterEvents: CounterEvents) {}
 
-		public increment() : Promise<void>
-		{
+		public increment() : Promise<void> {
 			return this.counterEvents.increment.fire(this, 1);
 		}
 	}
 
-	interface ICounterState
-	{
+	interface ICounterState {
 		count: number;
 	}
 
-	class CounterStateModifier
-	{
+	class CounterStateModifier {
 		initialState: ICounterState = {count: 2 };
 
 		@subscribe(CounterEvents,ec => ec.increment)
@@ -44,19 +38,16 @@ describe("Instantiating store", () =>
 		eventContainers: [CounterEvents],
 		services: [CounterService]
 	})
-	class MyStore
-	{
+	class MyStore {
 		@state(CounterStateModifier)
 		public counter: ICounterState = { count: 2 };
 	};
 
-	it("simple initialization", () =>
-	{
+	it("simple initialization", () => {
 		const store = buildStore(MyStore);
 	});
 
-	it("store modification", (done) =>
-	{
+	it("store modification", (done) => {
 		const store = buildStore(MyStore);
 		store.stateChanged.add(() =>
 		{
@@ -68,8 +59,7 @@ describe("Instantiating store", () =>
 		counterService.increment();
 	});
 
-	it("state as simple type", async () =>
-	{
+	it("state as simple type", async () => {
 		class SimpleStateModifier
 		{
 			initialState: number = 0;
@@ -97,8 +87,7 @@ describe("Instantiating store", () =>
 		assert.equal(1, simpleStore.getStoreState().count, "store state was not updated");
 	});
 
-	it("one of state items changed", async () =>
-	{
+	it("one of state items changed", async () => {
 		interface IComplexState
 		{
 			count: number;
@@ -136,8 +125,7 @@ describe("Instantiating store", () =>
 		assert.equal("John", simpleStore.getStoreState().simple.name, "parameter name has changed, but must be old");
 	});
 
-	it("empty store", () =>
-	{
+	it("empty store", () => {
 		@store({
 			eventContainers: [],
 		})
@@ -150,8 +138,7 @@ describe("Instantiating store", () =>
 		assert.deepEqual(content, {});
 	});
 
-	it("initial state", async () =>
-	{
+	it("initial state", async () => {
 		class SimpleStateModifier
 		{
 			initialState = 5;
@@ -554,5 +541,46 @@ describe("Instantiating store", () =>
 		assert.isNaN(originalModifiedState.originalState.a);
 		assert.equal(7, extendedModifierState.originalState.b);
 		assert.equal(8, extendedModifierState.extendedState.b);
+	});
+
+	it("call member of state modifier", async () => {
+		class SimpleEvents {
+			public amountChanged = new Event<number>();
+		}
+
+		interface IStateModifierState {
+			amount: number;
+		}
+
+		class StateModifier {
+			initialState: IStateModifierState = { amount: 0 }
+
+			@subscribe(SimpleEvents, se => se.amountChanged)
+			public onAmountChanged(prevState: IStateModifierState, args: number)
+			 : Partial<IStateModifierState> {
+				return {
+					amount: this.getNewAmount(prevState.amount, args)
+				};
+			}
+
+			private getNewAmount(prevAmount: number, increment: number) : number {
+				return prevAmount + increment;
+			}
+		}
+
+		@store({
+			eventContainers: [SimpleEvents],
+			services: []
+		})
+		class SimpleStore {
+			@state(StateModifier)
+			public stateModifierState: IStateModifierState = { amount: 0};
+		}
+
+		const simpleStore = buildStore(SimpleStore);
+		const simpleEvents = simpleStore.getEvent(SimpleEvents);
+		await simpleEvents.amountChanged.fire(simpleEvents, 5);
+		const newAmount = simpleStore.getStoreState().stateModifierState.amount;
+		assert.equal(5, newAmount);
 	});
 });

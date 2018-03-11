@@ -127,10 +127,12 @@ export class Store<T>
 
 				const eventContainerInstance = this.getEvent(eventResolver.eventContainer);
 				const eventHandler = eventResolver.getEventCallback(eventContainerInstance);
-				const stateModifierItem = 
-					stateModifier[stateModifierPropertyName] as any as (prevState: T[K], args: any) => Partial<T[K]>;
+				const stateModifierItem = stateModifier[stateModifierPropertyName];
+				const stateModifierCall = (prevState: T[K], args: any) => {
+					return stateModifierItem.call(stateModifier, prevState, args);
+				}
 				eventHandler(
-					this.subscribe(storeProperty, stateModifierItem, stateModifierPropertyName));
+					this.subscribe(storeProperty, stateModifierCall, stateModifierPropertyName));
 			}
 		}
 	}
