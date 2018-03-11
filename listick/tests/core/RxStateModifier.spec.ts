@@ -9,8 +9,7 @@ import { Observer } from "rxjs/Observer";
 
 describe("StateModifier using RxJs", () =>
 {
-	it("simple initialization", async () =>
-	{
+	it("simple initialization", async () => {
 		interface IMyState {
 			count: number;
 		}
@@ -47,15 +46,10 @@ describe("StateModifier using RxJs", () =>
 		assert.equal(8, myStore.getStoreState().myState.count);
 	});
 
-	it("delay call next", async () =>
-	{
+	it("delay call next", async () => {
 		interface IMyState {
 			count: number;
 		}
-
-		var promise = new Promise<number>((resolve, reject) => {
-			setTimeout(() => resolve(5), 500);
-		});
 
 		let globalObserver: Observer<number> | null = null;
 
@@ -73,6 +67,55 @@ describe("StateModifier using RxJs", () =>
 				return {
 					count: prevState.count + args
 				};
+			}
+		};
+
+		@store({
+			eventContainers: [MyEvents]
+		})
+		class simpleStore {
+			@state(MyStateModifier)
+			public myState: IMyState = { count: 5 }
+		}
+
+		const myStore = buildStore(simpleStore);
+
+		assert.equal(5, myStore.getStoreState().myState.count);
+
+		globalObserver!.next(2);
+
+		await new Promise((resolve, reject) => {
+			setTimeout(() => resolve(), 500);
+		});
+
+		assert.equal(7, myStore.getStoreState().myState.count);
+	});
+
+	it("call member of state modifier", async () => {
+		interface IMyState {
+			count: number;
+		}
+
+		let globalObserver: Observer<number> | null = null;
+
+		class MyEvents {
+			public myObserverChanged = new Observable<number>(observer => {
+				globalObserver = observer;
+			});
+		}
+
+		class MyStateModifier {
+			initialState: IMyState = { count: 5 }
+
+			@rxSubscribe(MyEvents, me => me.myObserverChanged)
+			public onMyObserverChanged(prevState: IMyState, args: number): Partial<IMyState> {
+				return {
+					count: this.incrementCount(prevState.count, args)
+				};
+			}
+
+			private incrementCount(prevCount: number, inc: number): number {
+				return prevCount + inc;
 			}
 		};
 
