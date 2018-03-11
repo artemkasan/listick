@@ -1,6 +1,6 @@
 {
   "name": "listick",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "description": "Laconic state container for TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,8 +18,8 @@
   "author": "Artem Labutin",
   "license": "MIT",
   "dependencies": {
-	"reflect-metadata": "^0.1.10",
-	"rxjs":"^5.5.6"
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.5.6"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",
