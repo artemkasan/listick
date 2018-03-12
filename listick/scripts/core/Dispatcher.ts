@@ -4,16 +4,14 @@ type DispatcherAction = () => void;
 /**
  * Dispatcher which forces to do all actions one by one.
  */
-export class Dispatcher
-{
+export class Dispatcher {
 	private invokeSubject: DispatcherAction[] = [];
 	private static _currentDispatcher: Dispatcher = new Dispatcher();
 
 	/**
 	 * Gets current dispatcher.
 	 */
-	public static get currentDispatcher(): Dispatcher
-	{
+	public static get currentDispatcher(): Dispatcher {
 		return this._currentDispatcher;
 	}
 
@@ -22,20 +20,15 @@ export class Dispatcher
 	 * @param callback that must be invoked.
 	 * @returns Promise that will be finished when callback successfully executed.
 	 */
-	public invoke<TArgs, TResult>(callback: () => void): Promise<void>
-	{
-		return new Promise<void>((resolve, reject) =>
-		{
-			this.invokeSubject.push(() =>
-			{
-				try
-				{
+	public invoke<TArgs, TResult>(callback: () => void): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			this.invokeSubject.push(() => {
+				try {
 					callback();
 					resolve();
 				}
-				catch
-				{
-					reject();
+				catch(e) {
+					reject(e);
 				}
 			});
 		
@@ -46,30 +39,24 @@ export class Dispatcher
 	/**
 	 * Starts new queue of actions processing.
 	 */
-	private startProcessingActions()
-	{
+	private startProcessingActions() {
 		setTimeout(() => this.processAction(), 1);
 	}
 
 	/**
 	 * Process one action from queue.
 	 */
-	private processAction()
-	{
-		try
-		{
+	private processAction() {
+		try {
 			const value = this.invokeSubject.splice(0, 1);
-			if(value.length > 0)
-			{
+			if(value.length > 0) {
 				value[0]();
 			}
 		}
-		catch (e)
-		{
+		catch (e) {
 			console.dir(e);
 		}
-		if(this.invokeSubject.length > 0)
-		{
+		if(this.invokeSubject.length > 0) {
 			this.startProcessingActions();
 		}
 	}
