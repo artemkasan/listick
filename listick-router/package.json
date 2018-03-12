@@ -1,6 +1,6 @@
 {
   "name": "listick-router",
-  "version": "0.2.1",
+  "version": "0.3.2",
   "description": "Add routing to listick",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "history": "^4.7.2",
-    "listick": "^0.2.1",
+    "listick": "^0.3.2",
     "prop-types": "^15.6.0",
     "reflect-metadata": "^0.1.10"
   },
