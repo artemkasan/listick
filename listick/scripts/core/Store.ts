@@ -24,6 +24,8 @@ export class Store<T>
 	 */
 	public stateChanged = new Event<{ name: string, newState:T}>();
 
+	public stateChangeFailed = new Event<any>();
+
 	constructor(
 		private storeInstance: T,
 		stateModifiersLinks: IStateModifierLink<T>[],
@@ -150,29 +152,40 @@ export class Store<T>
 		stateModifierItem: (prevState:T[K], args: TArgs) => Partial<T[K]>,
 		stateModifierPropertyName: string): (args: TArgs) => void {
 		return (args: TArgs) => {
-			const prevState = this.storeInstance[storeProperty] as any;
-			const newState = stateModifierItem(prevState, args) as any
-			if(newState === undefined) {
-				throw new Error(`function ${stateModifierPropertyName} returns undefined state which is not acceptable`);
-			}
+			try {
+				const prevState = this.storeInstance[storeProperty] as any;
+				const newState = stateModifierItem(prevState, args) as any
+				if(newState === undefined) {
+					throw new Error(`function ${stateModifierPropertyName}\
+					returns undefined state which is not acceptable`);
+				}
 
-			let newStorePropertyValue: any;
-			if(this.isObject(prevState)) {
-				newStorePropertyValue = {
-					...prevState,
-					...newState
+				if(this.isObject(newState) && Object.keys(newState).length == 0) {
+					// state has not chenged so simply return.
+					return;
+				}
+
+				let newStorePropertyValue: any;
+				if(this.isObject(prevState)) {
+					newStorePropertyValue = {
+						...prevState,
+						...newState
+					};
+				} else {
+					newStorePropertyValue = newState;
+				}
+
+				const newStoreState = this.storeInstance as any;
+				this.storeInstance = {
+					...newStoreState,
 				};
-			} else {
-				newStorePropertyValue = newState;
+
+				this.storeInstance[storeProperty] = newStorePropertyValue;
+				this.onStateChanged(stateModifierPropertyName);
 			}
-
-			const newStoreState = this.storeInstance as any;
-			this.storeInstance = {
-				...newStoreState,
-			};
-
-			this.storeInstance[storeProperty] = newStorePropertyValue;
-			this.onStateChanged(stateModifierPropertyName);
+			catch(e) {
+				this.onStateChangeFailed(e);
+			}
 		};
 	}
 
@@ -190,5 +203,14 @@ export class Store<T>
 	 */
 	private onStateChanged(reason: string): void {
 		this.stateChanged.fire(this, { name: reason, newState: this.storeInstance });
+	}
+
+	/**
+	 * Notifies by stateChangeFailed event that state
+	 * changing has failed.
+	 * @param error Occured error.
+	 */
+	private onStateChangeFailed(error: any): void {
+		this.stateChangeFailed.fire(this, error);
 	}
 }
