@@ -81,6 +81,8 @@ export class CounterStateModifier implements IStateModifier<ICounterState>
 Inside state modifier we have to define initial state for state modifier. Implementation of ```IStateModifier<TState>``` is optional because of duck typing.
 Each method of state modifier that must listen for events and mutate state must be marked by **@subscribe** decorator. It defines which event must be listened. Method itself returns mutated part of state. If state is simple type, this simple type can be returned.
 
+If you do not need to modify state, simply return empty object.
+
 Also it is possible to subscribe to rxjs observables for this you need to use use special import for **subscribe** decorator.
 
 ```ts

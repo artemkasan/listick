@@ -1,6 +1,6 @@
 import "mocha";
 
-import { inject, state, store, subscribe, buildStore, Event, extendStore } from '../../scripts';
+import { inject, state, store, subscribe, buildStore, Event, extendStore, Dispatcher } from '../../scripts';
 import { assert, expect } from "chai";
 
 describe("Instantiating store", () => {
@@ -582,5 +582,51 @@ describe("Instantiating store", () => {
 		await simpleEvents.amountChanged.fire(simpleEvents, 5);
 		const newAmount = simpleStore.getStoreState().stateModifierState.amount;
 		assert.equal(5, newAmount);
+	});
+
+	it("state update not invked if state modifier returend nothing", async () => {
+		class SimpleEvents {
+			public amountChanged = new Event<number>();
+		}
+
+		interface IStateModifierState {
+			amount: number;
+		}
+
+		class StateModifier {
+			initialState: IStateModifierState = { amount: 0 }
+
+			@subscribe(SimpleEvents, se => se.amountChanged)
+			public onAmountChanged(prevState: IStateModifierState, args: number)
+			 : Partial<IStateModifierState> {
+				return {
+				};
+			}
+		}
+
+		@store({
+			eventContainers: [SimpleEvents],
+			services: []
+		})
+		class SimpleStore {
+			@state(StateModifier)
+			public stateModifierState: IStateModifierState = { amount: 0};
+		}
+
+		let stateChangedInvoked = false;
+
+		const simpleStore = buildStore(SimpleStore);
+		simpleStore.stateChanged.add(() => {
+			stateChangedInvoked = true;
+		});
+		const simpleEvents = simpleStore.getEvent(SimpleEvents);
+		await simpleEvents.amountChanged.fire(simpleEvents, 5);
+		const newAmount = simpleStore.getStoreState().stateModifierState.amount;
+		assert.equal(0, newAmount);
+		// Simply put our message in the queue last and wait for execution.
+		// Then we make sure if state changed was invoked or not.
+		await Dispatcher.currentDispatcher.invoke(() => {
+		});
+		assert.isFalse(stateChangedInvoked, "state change unexpectly was called");
 	});
 });
