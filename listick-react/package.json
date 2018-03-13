@@ -1,6 +1,6 @@
 {
 	"name": "listick-react",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"description": "Allows to use listick in react",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -19,7 +19,7 @@
 	"author": "Artem Labutin",
 	"license": "MIT",
 	"dependencies": {
-		"listick": "^0.3.2",
+		"listick": "^0.3.3",
 		"prop-types": "^15.6.0",
 		"react": "^16.1.1",
 		"reflect-metadata": "^0.1.10"
