@@ -1,19 +1,24 @@
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = (env) =>
 {
 	const isDevBuild = !(env && env.prod);
-	const extractCSS = new ExtractTextPlugin('vendor.css');
+	const extractCSS = new MiniCssExtractPlugin({
+		filename:'vendor.css', 
+		chunkFilename: "[id].css"
+	});
+
 
 	const clientConfig = {
+		mode: isDevBuild ? "development" : "production",
 		stats: { modules: false },
 		resolve: { extensions: ['.js'] },
 		module: {
 			rules: [
 				{ test: /\.(png|woff|woff2|eot|ttf|svg)(\?|$)/, use: 'url-loader?limit=100000' },
-				{ test: /\.css(\?|$)/, use: extractCSS.extract({ use: isDevBuild ? 'css-loader' : 'css-loader?minimize' }) }
+				{ test: /\.s?[ac]ss$/, use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader',] }
 			]
 		},
 		entry: {

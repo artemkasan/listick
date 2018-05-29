@@ -1,33 +1,32 @@
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 
 module.exports = (env) =>
 {
 	const isDevBuild = !(env && env.prod);
 
-	const extractSass = new ExtractTextPlugin({
-		filename: 'site.css'
+	const extractSass = new MiniCssExtractPlugin({
+		filename: 'site.css',
+		chunkFilename: "[id].css"
 	});
 
 	const clientConfig =
 		{
+			mode: isDevBuild ? "development" : "production",
 			resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx','.scss'] },
 			stats: { modules: false },
 			entry: { 'main-client': './client/boot-client.tsx' },
 			module: {
 				rules: [
 					{
-						test: /\.scss$/,
-						use: extractSass.extract({
-							use: [
-								(isDevBuild ? 'css-loader' : 'css-loader?minimize'),
-								'resolve-url-loader',
-								'sass-loader?sourceMap'],
-							// use style-loader in development
-							fallback: "style-loader"
-						})
+						test: /\.s?[ac]ss$/,
+						use: [
+							MiniCssExtractPlugin.loader,
+							'css-loader',
+							'sass-loader',
+						]
 					},
 					{ test: /\.tsx?$/, include: /client/, use: 'awesome-typescript-loader?silent=true' },
 					{ test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
