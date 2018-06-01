@@ -76,17 +76,21 @@ StoreContainer component.')
 		connector.prototype = Object.create(target.prototype);
 		const componentDidMountBase: () => void = connector.prototype.componentDidMount;
 		const componentWillUnmountBase: () => void = connector.prototype.componentWillUnmount;
+		const setStateBase: (state: any, context?: any) => void = connector.prototype.setState;
 
 		// We need to listen to state change only when component is mounted.
 		connector.prototype.componentDidMount = function() {
 			if(store != null) {
 				subscribedFunction = (sender: any, args: any) => {
-					this.setState(stateGet(store.getStoreState()));
+					const newState = stateGet(store.getStoreState());
+					setStateBase.apply(this, [newState]);
 				};
 				store.stateChanged.add(subscribedFunction)
 			}
 
-			componentDidMountBase.call(this, arguments);
+			if(componentDidMountBase != null) {
+				componentDidMountBase.apply(this, arguments);
+			}
 		};
 
 		connector.prototype.componentWillUnmount = function() {
@@ -94,7 +98,9 @@ StoreContainer component.')
 				store.stateChanged.remove(subscribedFunction);
 			}
 
-			componentWillUnmountBase.call(this, arguments);
+			if(componentWillUnmountBase != null) {
+				componentWillUnmountBase.apply(this, arguments);
+			}
 		};
 
 		connector.prototype.setState = function() {
@@ -102,8 +108,10 @@ StoreContainer component.')
 				console.warn("Attempt to change state from React component, \
 but this component is connected to listick state. \
 State change ignored.");
+			} else if(setStateBase != null) {
+				setStateBase.apply(this, arguments);
 			}
-		};
+		}
 
 		connector.contextTypes = {
 			store: PropTypes.object.isRequired
