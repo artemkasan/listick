@@ -74,6 +74,8 @@ StoreContainer component.')
 					return constructorOverride(props, context, this); \
 				}`)(constructorOverride);
 		connector.prototype = Object.create(target.prototype);
+		const componentDidMountBase: () => void = connector.prototype.componentDidMount;
+		const componentWillUnmountBase: () => void = connector.prototype.componentWillUnmount;
 
 		// We need to listen to state change only when component is mounted.
 		connector.prototype.componentDidMount = function() {
@@ -83,12 +85,16 @@ StoreContainer component.')
 				};
 				store.stateChanged.add(subscribedFunction)
 			}
+
+			componentDidMountBase.call(this, arguments);
 		};
 
 		connector.prototype.componentWillUnmount = function() {
 			if(store != null) {
 				store.stateChanged.remove(subscribedFunction);
 			}
+
+			componentWillUnmountBase.call(this, arguments);
 		};
 
 		connector.prototype.setState = function() {
