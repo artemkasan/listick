@@ -72,19 +72,45 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 				}`)(constructorOverride);
 		connector.prototype = Object.create(target.prototype);
 
+    const componentDidMountBase: () => void = connector.prototype.componentDidMount;
+		const componentWillUnmountBase: () => void = connector.prototype.componentWillUnmount;
+		const setStateBase: (state: any, context?: any) => void = connector.prototype.setState;
+
 		// We need to listen to state change only when component is mounted.
-		connector.prototype.componentDidMount = function()
-		{
-			subscribedFunction = (sender: any, args: any) =>
-			{
-				this.setState(stateGet(store.getStoreState()));
-			};
-			store.stateChanged.add(subscribedFunction)
+		connector.prototype.componentDidMount = function() {
+			if(store != null) {
+				subscribedFunction = (sender: any, args: any) => {
+					const newState = stateGet(store.getStoreState());
+					setStateBase.apply(this, [newState]);
+				};
+				store.stateChanged.add(subscribedFunction)
+			}
+
+			if(componentDidMountBase != null) {
+				componentDidMountBase.apply(this, arguments);
+			}
 		};
-		connector.prototype.componentWillUnmount = function()
-		{
-			store.stateChanged.remove(subscribedFunction);
+
+		connector.prototype.componentWillUnmount = function() {
+			if(store != null) {
+				store.stateChanged.remove(subscribedFunction);
+			}
+
+			if(componentWillUnmountBase != null) {
+				componentWillUnmountBase.apply(this, arguments);
+			}
 		};
+
+		connector.prototype.setState = function() {
+			if(store != null) {
+				console.warn("Attempt to change state from React component, \
+but this component is connected to listick state. \
+State change ignored.");
+			} else if(setStateBase != null) {
+				setStateBase.apply(this, arguments);
+			}
+		}
+
 		connector.contextTypes = {
 			store: PropTypes.object.isRequired
 		}
