@@ -18,7 +18,7 @@ import { WeatherService } from "./services/weatherService";
 export class AppStore
 {
 	@state(CounterStateModifier)
-	public counterState: ICounterState= {
+	public counterState: ICounterState = {
 		counter: 2
 	};
 
