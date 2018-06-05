@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"target": "es5",
+		"jsx": "react",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"sourceMap": true,
+		"skipDefaultLibCheck": true,
+		"strict": true,
+		"lib": ["es6"],
+		"types": ["node", "express"]
+	},
+	"files": [
+		"app.ts"
+	]
+}

@@ -29,6 +29,8 @@ export class AppStore
 
 	@state(WeatherStateModifier)
 	public weatherState: IWeatherState = {
-		gridState: WeatherGridState.notInitialized, error: null, content: null
+		gridState: WeatherGridState.notInitialized,
+		error: null,
+		content: null
 	};
 }
