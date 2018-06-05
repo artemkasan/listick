@@ -11,5 +11,7 @@ import { CounterStateModifier, ICounterState } from "./stateModifiers/counterSta
 export class AppStore
 {
 	@state(CounterStateModifier)
-	public counterState: ICounterState;
+	public counterState: ICounterState = {
+		counter: 2
+	};
 }
