@@ -6,7 +6,7 @@ import { AppStore } from '../appStore';
 import { WeatherService } from '../services/weatherService';
 import { IWeatherState, WeatherGridState } from '../stateModifiers/weatherStateModifier';
 
-@connect<RouteComponentProps<any>, IWeatherState>((store: AppStore) => store.weatherState)
+@connect<RouteComponentProps<any>, IWeatherState, AppStore>((store: AppStore) => store.weatherState)
 export default class Weather extends React.Component<RouteComponentProps<any>, IWeatherState> {
 
 	/**

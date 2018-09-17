@@ -7,7 +7,7 @@ import { ICounterState } from "../stateModifiers/counterStateModifier";
 import { CounterService } from "../services/counterService";
 import { Button, Progress } from "semantic-ui-react";
 
-@connect<RouteComponentProps<any>, ICounterState>((store: AppStore) => store.counterState)
+@connect<RouteComponentProps<any>, ICounterState, AppStore>((store: AppStore) => store.counterState)
 export default class Counter extends React.Component<RouteComponentProps<any>, ICounterState>
 {
 	/**
