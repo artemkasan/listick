@@ -77,7 +77,9 @@ export function connect<TProps, TState, TStore>(stateGet: (store: TStore) => TSt
 				if(store != null) {
 					subscribedFunction = (sender: any, args: any) => {
 						const newState = stateGet(store.getStoreState());
-						setStateBase.apply(this, [newState]);
+						if(this.state !== newState) {
+							setStateBase.apply(this, [newState]);
+						}
 					};
 					store.stateChanged.add(subscribedFunction)
 				}
@@ -149,12 +151,13 @@ State change ignored.");
 
 					function componentDidMount (target: React.Component<TProps, TState>) {
 						if(store != null) {
-							return (...args: any[]) =>
-							{
+							return (...args: any[]) => {
 								const pStore = store;
 								subscribedFunction = (sender: any, args: any) => {
 									const newState = stateGet(pStore.getStoreState());
-									Reflect.get(target, "setState").apply(target, [newState]);
+									if(newState !== target.state) {
+										Reflect.get(target, "setState").apply(target, [newState]);
+									}
 								};
 								store.stateChanged.add(subscribedFunction)
 							}
