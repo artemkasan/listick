@@ -24,6 +24,14 @@ export default class Counter extends React.Component<RouteComponentProps<any>, I
 		super(props, context);
 	}
 
+	componentWillMount() {
+		
+	}
+
+	componentDidMount() {
+		
+	}
+
 	public render()
 	{
 		return <div>
