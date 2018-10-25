@@ -159,7 +159,11 @@ State change ignored.");
 										Reflect.get(target, "setState").apply(target, [newState]);
 									}
 								};
-								store.stateChanged.add(subscribedFunction)
+								store.stateChanged.add(subscribedFunction);
+								const original_componentDidMount = Reflect.get(target, "componentDidMount");
+								if(original_componentDidMount) {
+									original_componentDidMount();
+								}
 							}
 						}
 			
@@ -170,6 +174,10 @@ State change ignored.");
 						if(store != null) {
 							return (...args: any[]) => {
 								store.stateChanged.remove(subscribedFunction);
+								const original_componentWillunmount = Reflect.get(target, "componentWillUnmount");
+								if(original_componentWillunmount) {
+									original_componentWillunmount();
+								}
 							}
 						}
 			

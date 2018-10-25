@@ -30,7 +30,7 @@
     "history": "^4.7.2",
     "isomorphic-fetch": "^2.2.1",
     "listick": "0.3.3",
-    "listick-react": "0.3.5",
+    "listick-react": "^0.3.8",
     "listick-devtools": "0.3.3",
     "react": "16.4.0",
     "react-dom": "16.4.0",
