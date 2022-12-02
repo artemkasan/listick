@@ -53,7 +53,7 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 				}
 			}
 
-			const targetArgs: any[] = [
+			const targetArgs: [props: TProps, context: any, ...services: any[]] = [
 				props,
 				context,
 				...requestedServices
@@ -74,20 +74,19 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 
     const componentDidMountBase: () => void = connector.prototype.componentDidMount;
 		const componentWillUnmountBase: () => void = connector.prototype.componentWillUnmount;
-		const setStateBase: (state: any, context?: any) => void = connector.prototype.setState;
 
 		// We need to listen to state change only when component is mounted.
 		connector.prototype.componentDidMount = function() {
 			if(store != null) {
 				subscribedFunction = (sender: any, args: any) => {
 					const newState = stateGet(store.getStoreState());
-					setStateBase.apply(this, [newState]);
+					this.updater.enqueueReplaceState(this, newState);
 				};
 				store.stateChanged.add(subscribedFunction)
 			}
 
 			if(componentDidMountBase != null) {
-				componentDidMountBase.apply(this, arguments);
+				componentDidMountBase.apply(this, arguments as any);
 			}
 		};
 
@@ -97,18 +96,12 @@ export function connect<TProps, TState>(stateGet: (store: any) => TState): Conne
 			}
 
 			if(componentWillUnmountBase != null) {
-				componentWillUnmountBase.apply(this, arguments);
+				componentWillUnmountBase.apply(this, arguments as any);
 			}
 		};
 
 		connector.prototype.setState = function() {
-			if(store != null) {
-				console.warn("Attempt to change state from React component, \
-but this component is connected to listick state. \
-State change ignored.");
-			} else if(setStateBase != null) {
-				setStateBase.apply(this, arguments);
-			}
+			throw new Error("State of this React component is managed by listick.");
 		}
 
 		connector.contextTypes = {
